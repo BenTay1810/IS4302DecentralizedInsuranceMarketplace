@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import ".deps/npm/@openzeppelin/contracts/access/Ownable.sol";
 import "./CIToken.sol";
 
 contract InsuranceCompany is Ownable {
