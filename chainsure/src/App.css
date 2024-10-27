@@ -36,3 +36,15 @@
     transform: rotate(360deg);
   }
 }
+
+.buy-button {
+  background-color: #0D4460;
+  color: white;
+  border: none;
+  width: 100px;
+}
+
+.list-button {
+  background-color: #0D4460;
+  color: white;
+}
