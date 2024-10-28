@@ -5,6 +5,8 @@ import ".deps/npm/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import ".deps/npm/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import ".deps/npm/@openzeppelin/contracts/access/Ownable.sol";
 import ".deps/npm/@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
+import "@openzeppelin/contracts/utils/Strings.sol"; // for error specification
+
 
 contract CIToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
     uint256 private remainingCollateral;
@@ -14,7 +16,7 @@ contract CIToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
 
     // Define a Mint event
     event Mint(address indexed to, uint256 amount, uint256 collateral);
-    event UserTokenInfo(address indexed account, uint256 amtTokens, uint256 collateral);
+    event UserTokenInfo(address indexed account, uint256 amtTokens, uint256 collateral, uint256 conversionRate);
 
     constructor() payable 
         ERC20("Co-InsuranceToken", "CIT")
@@ -29,11 +31,20 @@ contract CIToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
 
     // I dont think this should be onlyOwner, cuz that would mean only the contract deployer can mint
     function mint(uint256 amount, uint256 conversionRate) public payable onlyOwner {
-        uint256 requiredCollateral = amount * conversionRate * 0.5 ether;  
-        // 0.5 ether here was for me to test w/o going over 100 ether limit, might want to just use default wei value?
+        uint256 requiredCollateral = amount * conversionRate; // stick with default wei value
 
         // Do we let them pay over the required then transfer any excess back, instead of hard fixing it has to be the exact same?
-        require(msg.value == requiredCollateral, "You should be inputting a value that is the amt of tokens * conversionRate");
+        require(msg.value == requiredCollateral, 
+            string(
+                abi.encodePacked(
+                    "Insufficient collateral: Required ", 
+                    Strings.toString(requiredCollateral), 
+                    " wei, but provided ", 
+                    Strings.toString(msg.value), 
+                    " wei."
+                )
+            )
+        );
 
         _mint(msg.sender, amount);  // Mint tokens to whoever created the CI token
         collateral[msg.sender] += msg.value;  // Record the ether collateral
@@ -42,15 +53,29 @@ contract CIToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
         emit Mint(msg.sender, amount, requiredCollateral); // Announce that you have minted how many tokens and collateral involved
     }
 
-    function topUpMyCollateral(uint256 amount) public payable mustBeTokenOwner {
-        // still deciding the logic
+     function topUpMyTokens(uint256 amount) public payable mustBeTokenOwner {
+        uint256 storedConversionRate = userConversionRate[msg.sender];
+        uint256 requiredCollateral = amount * storedConversionRate;
+        require(msg.value == requiredCollateral, 
+            string(
+                abi.encodePacked(
+                    "Insufficient collateral: Required ", 
+                    Strings.toString(requiredCollateral), 
+                    " wei, but provided ", 
+                    Strings.toString(msg.value), 
+                    " wei."
+                )
+            )
+        );
+        _mint(msg.sender,amount); // Adds more tokens to user's existing token supply since they topped up
+        collateral[msg.sender] += msg.value;  // Record the top up in collateral too
     }
 
     function getMyTokenInformation() public mustBeTokenOwner {
         remainingCollateral = collateral[msg.sender];
-        uint256 collateralInEth = remainingCollateral / 1 ether; // Convert from wei to ether
+        uint256 storedConversionRate = userConversionRate[msg.sender];
         uint256 currentTokensRemaining = balanceOf(msg.sender);
-        emit UserTokenInfo(msg.sender, currentTokensRemaining, collateralInEth);
+        emit UserTokenInfo(msg.sender, currentTokensRemaining, remainingCollateral, storedConversionRate);
     }
 
     // should this be public? i feel like it should be handled by the marketplace contract only to burn
