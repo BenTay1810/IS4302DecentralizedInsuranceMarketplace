@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.20+commit.a1b79de6"
+		"version": "0.8.26+commit.8a97fa7a"
 	},
 	"language": "Solidity",
 	"output": {
@@ -938,7 +938,7 @@
 		"compilationTarget": {
 			"contracts/CIToken.sol": "CIToken"
 		},
-		"evmVersion": "shanghai",
+		"evmVersion": "cancun",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -1159,11 +1159,11 @@
 			]
 		},
 		"contracts/CIToken.sol": {
-			"keccak256": "0x140f9d16a81483868bc2075f5014196d7d81cb4dfe5d523792416144cc4389f4",
+			"keccak256": "0xc550814cbf23efcfccea45f0d3c3826de7cb5744daa09f51588f74d1a420bb28",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://93f164f9e598505356fba7027f19672a951e41d591285a53b1c007e1ff2705ae",
-				"dweb:/ipfs/QmacQZhSZDBpX78XDD5bsuowHUuqssQDEHemVM9y32cuCH"
+				"bzz-raw://b76578bda5b9daaa60eb63e84c4e1544b47376b4a0d75c108ccd651919468371",
+				"dweb:/ipfs/QmQFnUyLC5Y3HwiJpJLESzRAW3p9i2erNR29wfPojD8FZo"
 			]
 		}
 	},

@@ -29,8 +29,8 @@ contract CIToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
         _;
     }
 
-    // I dont think this should be onlyOwner, cuz that would mean only the contract deployer can mint
-    function mint(uint256 amount, uint256 conversionRate) public payable onlyOwner {
+    // Got rid of onlyOwner so everyone/company can mint a token
+    function mint(uint256 amount, uint256 conversionRate) public payable {
         uint256 requiredCollateral = amount * conversionRate; // stick with default wei value
 
         // Do we let them pay over the required then transfer any excess back, instead of hard fixing it has to be the exact same?
