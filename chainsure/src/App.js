@@ -8,6 +8,8 @@ import List1 from './components/List1';
 import Home from './components/Home';
 import List2 from './components/List2';
 import List3 from './components/List3';
+import Account from './components/Account';
+import Claim1 from './components/Claim1';
 
 function App() {
   const policies = [
@@ -35,6 +37,8 @@ function App() {
           <Route path="/list1" element={<List1 />} />
           <Route path="/list2" element={<List2 />} />
           <Route path="/list3" element={<List3 />} />
+          <Route path='/myacc' element={<Account policies={policies} />} />
+          <Route path='/claim1' element={<Claim1 />} />
           {/* Add more routes as needed */}
         </Routes>
       </div>

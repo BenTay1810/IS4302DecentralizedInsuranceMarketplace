@@ -13,7 +13,7 @@ const Navbar = () => {
             <Link className="nav-link" to="/">Marketplace</Link>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#about">My Account</a>
+            <Link className="nav-link" to="/myacc">My Account</Link>
           </li>
           <li className="nav-item">
             <a className="nav-link" href="#contact">Wallet</a>
