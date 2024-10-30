@@ -8,6 +8,8 @@ import "./CIToken.sol";
 contract InsuranceCompany is Ownable {
     CIToken public token;
     mapping(string => bool) private validPolicyTypes;
+    uint public creationTime = block.timestamp; //  Track when the user buys hmm
+    uint oneWeek = 1 weeks; // PLACEHOLDER IDEA TO GET RID OF ACTIVE
 
     constructor(CIToken _token) Ownable(msg.sender) {
         token = _token;
@@ -37,7 +39,7 @@ contract InsuranceCompany is Ownable {
     }
 
     /* I think we missed out the coverage date here? Ie. start date and end date? to determine like how long
-       is the time period they can claim their tokens for */
+       is the time period they can claim their tokens for */ 
     struct Policy {
         uint256 policyId;
         string policyName;
@@ -48,7 +50,7 @@ contract InsuranceCompany is Ownable {
         uint256 minStake;
         address creator;
         bool listed;
-        bool active;
+        bool active; // replace with uint coverage period
     }
 
     uint256 public policyCount;
@@ -56,7 +58,7 @@ contract InsuranceCompany is Ownable {
     mapping(uint256 => Policy) policies;
 
     event PolicyCreated(uint256 policyId, string policyName, address creator);
-    event PolicyClaimed(uint256 policyId, uint256 claimValue);
+    event PolicyClaimed(uint256 policyId, uint256 claimValue); 
 
     function calculateNetClaimValue(Policy memory p)
         public

@@ -20,7 +20,7 @@ contract CIToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
 
     constructor() payable 
         ERC20("Co-InsuranceToken", "CIT")
-        Ownable(msg.sender)
+        Ownable(msg.sender)  // can get rid of it i guess
         ERC20Permit("Co-InsuranceToken")
     {}
 
@@ -29,8 +29,12 @@ contract CIToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
         _;
     }
 
-    // Got rid of onlyOwner so everyone/company can mint a token
-    function mint(uint256 amount, uint256 conversionRate) public payable {
+    modifier mustNotBeTokenOwner() {
+        require(collateral[msg.sender] == 0, "You must not have minted tokens to query this information");
+        _; // This allows the function body to execute if the condition is met
+    }
+
+    function mint(uint256 amount, uint256 conversionRate) public payable mustNotBeTokenOwner{
         uint256 requiredCollateral = amount * conversionRate; // stick with default wei value
 
         // Do we let them pay over the required then transfer any excess back, instead of hard fixing it has to be the exact same?
@@ -76,6 +80,14 @@ contract CIToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
         uint256 storedConversionRate = userConversionRate[msg.sender];
         uint256 currentTokensRemaining = balanceOf(msg.sender);
         emit UserTokenInfo(msg.sender, currentTokensRemaining, remainingCollateral, storedConversionRate);
+    }
+
+    function getUserCollateral() public view mustBeTokenOwner returns (uint256) {
+        return collateral[msg.sender];
+    }
+
+    function getUserConversionRate() public view mustBeTokenOwner returns (uint256) {
+        return userConversionRate[msg.sender];
     }
 
     // should this be public? i feel like it should be handled by the marketplace contract only to burn
