@@ -8,7 +8,7 @@
 			{
 				"inputs": [
 					{
-						"internalType": "contract CIToken",
+						"internalType": "contract CSToken",
 						"name": "_token",
 						"type": "address"
 					}
@@ -167,6 +167,60 @@
 								"type": "uint256"
 							},
 							{
+								"internalType": "uint256",
+								"name": "creationTime",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "coveragePeriod",
+								"type": "uint256"
+							},
+							{
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "year",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "month",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "day",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct InsuranceCompany.Date",
+								"name": "creationDate",
+								"type": "tuple"
+							},
+							{
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "year",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "month",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "day",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct InsuranceCompany.Date",
+								"name": "coverageEndDate",
+								"type": "tuple"
+							},
+							{
 								"internalType": "address",
 								"name": "creator",
 								"type": "address"
@@ -174,11 +228,6 @@
 							{
 								"internalType": "bool",
 								"name": "listed",
-								"type": "bool"
-							},
-							{
-								"internalType": "bool",
-								"name": "active",
 								"type": "bool"
 							}
 						],
@@ -225,6 +274,11 @@
 					},
 					{
 						"internalType": "uint256",
+						"name": "_claimBackRate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
 						"name": "_maxPoolValue",
 						"type": "uint256"
 					},
@@ -235,7 +289,7 @@
 					},
 					{
 						"internalType": "uint256",
-						"name": "_claimBackRate",
+						"name": "_coveragePeriod",
 						"type": "uint256"
 					}
 				],
@@ -292,6 +346,60 @@
 								"type": "uint256"
 							},
 							{
+								"internalType": "uint256",
+								"name": "creationTime",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "coveragePeriod",
+								"type": "uint256"
+							},
+							{
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "year",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "month",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "day",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct InsuranceCompany.Date",
+								"name": "creationDate",
+								"type": "tuple"
+							},
+							{
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "year",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "month",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "day",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct InsuranceCompany.Date",
+								"name": "coverageEndDate",
+								"type": "tuple"
+							},
+							{
 								"internalType": "address",
 								"name": "creator",
 								"type": "address"
@@ -299,11 +407,6 @@
 							{
 								"internalType": "bool",
 								"name": "listed",
-								"type": "bool"
-							},
-							{
-								"internalType": "bool",
-								"name": "active",
 								"type": "bool"
 							}
 						],
@@ -353,7 +456,7 @@
 				"name": "token",
 				"outputs": [
 					{
-						"internalType": "contract CIToken",
+						"internalType": "contract CSToken",
 						"name": "",
 						"type": "address"
 					}
@@ -650,20 +753,28 @@
 				"dweb:/ipfs/QmVUSvooZKEdEdap619tcJjTLcAuH6QBdZqAzWwnAXZAWJ"
 			]
 		},
-		"contracts/CIToken.sol": {
-			"keccak256": "0xc550814cbf23efcfccea45f0d3c3826de7cb5744daa09f51588f74d1a420bb28",
+		"contracts/CSToken.sol": {
+			"keccak256": "0x3aa511e9439ffb3a280dcb3d4a95bbb27966173c5acfff115714f05e36a7d971",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b76578bda5b9daaa60eb63e84c4e1544b47376b4a0d75c108ccd651919468371",
-				"dweb:/ipfs/QmQFnUyLC5Y3HwiJpJLESzRAW3p9i2erNR29wfPojD8FZo"
+				"bzz-raw://a17be82e82873bb7bb69bda8e7177b9e03376d9da91ae1695cd0aa6acd77719a",
+				"dweb:/ipfs/QmTaaQBzNuk3SyXpWxTo8a2x5ySwCHd4EQwXnqeyzYdWVD"
 			]
 		},
 		"contracts/InsuranceCompany.sol": {
-			"keccak256": "0x65d78a9d638a03efadcc8172a5449be2cf2b4d02d598a3bffc12aea97df33026",
+			"keccak256": "0xe32796b012e040bfd9bd9861895b82771e5cf5ffe3c3289f8cb81a60002b94f6",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://9769ff6f09d1fcc668b8ef64cc6188f929a53220e5093b36bb3e5fa30719c1ae",
-				"dweb:/ipfs/QmajskxcMGjNpkzGVzoC2ZjMGCDb5iMFVWd8EcnNKpuz4B"
+				"bzz-raw://f9641b072cb9e3fcb386aaecabce115f011ce49831867f488d6ce1e4936b8b05",
+				"dweb:/ipfs/QmcU9W28adWHhAe5QQ3Y1DdLvtAmmjBgN8bKkwmuh3P75f"
+			]
+		},
+		"https://github.com/0x00pluto/solidity-datetime/blob/master/contracts/DateTime.sol": {
+			"keccak256": "0x3e6031d05cd13aa1ea1bcaf59d6a4b20054ddc18a86514e44e66cd4ed4dc4445",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://2ce88e00d8a888f45bcf3ef95df7bcf8b90b97e4465b0427ba3407e3d19dc931",
+				"dweb:/ipfs/QmWwtMzN9fpxWF3RvhzsPFjQCsmiKhWV7LMKngKj5Xu3ne"
 			]
 		}
 	},

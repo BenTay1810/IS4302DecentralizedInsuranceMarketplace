@@ -3,15 +3,16 @@ pragma solidity ^0.8.20;
 
 import ".deps/npm/@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol"; // for error specification
-import "./CIToken.sol";
+import "https://github.com/0x00pluto/solidity-datetime/blob/master/contracts/DateTime.sol"; // for date time
+
+import "./CSToken.sol";
 
 contract InsuranceCompany is Ownable {
-    CIToken public token;
+    CSToken public token;
     mapping(string => bool) private validPolicyTypes;
-    uint public creationTime = block.timestamp; //  Track when the user buys hmm
-    uint oneWeek = 1 weeks; // PLACEHOLDER IDEA TO GET RID OF ACTIVE
+    uint256 timestamp = block.timestamp; // current time as timestamp
 
-    constructor(CIToken _token) Ownable(msg.sender) {
+    constructor(CSToken _token) Ownable(msg.sender) {
         token = _token;
         validPolicyTypes["Travel"] = true;
         validPolicyTypes["Property"] = true;
@@ -38,8 +39,7 @@ contract InsuranceCompany is Ownable {
         _;
     }
 
-    /* I think we missed out the coverage date here? Ie. start date and end date? to determine like how long
-       is the time period they can claim their tokens for */ 
+    /* Added in creation Time + coverage period to replace active */
     struct Policy {
         uint256 policyId;
         string policyName;
@@ -48,10 +48,20 @@ contract InsuranceCompany is Ownable {
         uint256 maxPoolValue;
         uint256 currPoolValue;
         uint256 minStake;
+        uint256 creationTime;
+        uint coveragePeriod;
+        Date creationDate;     
+        Date coverageEndDate;
         address creator;
         bool listed;
-        bool active; // replace with uint coverage period
     }
+
+    struct Date {
+        uint256 year;
+        uint256 month;
+        uint256 day;
+    }
+
 
     uint256 public policyCount;
 
@@ -79,13 +89,14 @@ contract InsuranceCompany is Ownable {
         return sum;
     }
 
-    // removed OnlyOwner modifier from this so that everyone can create a policy
+    // Anyone who has enough tokens > max pool value & not at risk of bankruptcy from claim back rate will be able to create a policy
     function createNewPolicy(
         string memory _policyName,
         string memory _policyType, 
+        uint256 _claimBackRate, // r we gonna require claim back rate > conversion rate?
         uint256 _maxPoolValue,
-        uint256 _minStake,
-        uint256 _claimBackRate // r we gonna require claim back rate > conversion rate?
+        uint256 _minStake, // min amount of tokens (premium) that a buyer must pay to get a share of being insured under the policy
+        uint _coveragePeriod // default this to days
     ) external checkEnoughTokenBal(_maxPoolValue) validPolicyType(_policyType) {
         require(
             // I think there is some logic error here on address(this)) being the one to check against
@@ -102,11 +113,22 @@ contract InsuranceCompany is Ownable {
                    it will know how to segregate the tokens according to the creators.
 
             */
-            token.balanceOf(address(this)) > calculateAllNetClaimValue(),
+
+            // there needs to be a token transfer to this contract as well ideally (to reduce the max pool from the token owner)
+
+            token.balanceOf(address(msg.sender)) > calculateAllNetClaimValue(),
             "Risk of bankruptcy: reduce the max pool value for this policy"
         );
 
         policyCount++;
+        Date memory creationDate;
+        (creationDate.year, creationDate.month, creationDate.day) = DateTime.timestampToDate(timestamp);
+        // Call timestampToDate to get year, month, and day and convert to Date struct to prevent stack too deep error
+        uint256 coverageEndTimestamp = timestamp + (_coveragePeriod * 1 days);
+        Date memory coverageEndDate;
+        (coverageEndDate.year, coverageEndDate.month, coverageEndDate.day) = DateTime.timestampToDate(coverageEndTimestamp);
+
+
         policies[policyCount] = Policy({
             policyId: policyCount,
             policyName: _policyName,
@@ -116,9 +138,12 @@ contract InsuranceCompany is Ownable {
             currPoolValue: 0, /* correct me if wrong, curr Pool value should be based on initial max pool value,
                                  and then decremented as buyers start to purchase the policy? */
             minStake: _minStake,
-            creator: msg.sender,
-            listed: false,
-            active: true
+            creationTime: block.timestamp,              // track creation time
+            coveragePeriod: _coveragePeriod * 1 days, 
+            creationDate: creationDate,
+            coverageEndDate: coverageEndDate, // think we discussed that time to make it 1 day [prob is blockchain stores as seconds]
+            creator: msg.sender, 
+            listed: false
         });
 
         emit PolicyCreated(policyCount, _policyName, msg.sender);
@@ -130,7 +155,7 @@ contract InsuranceCompany is Ownable {
     }
 
     /* A bit lost on needing to add collateral here, i thought adding collateral was to add to no of tokens original owner has?
-       Unless it is to add to the max pool value? */
+       Unless it is to add to the max pool value?  Is this still needed?*/
     function addCollateral(uint256 amount) external {
         require(amount > 0, "Amount must be greater than zero");
         require(
@@ -142,12 +167,12 @@ contract InsuranceCompany is Ownable {
     }
 
     /* Does it make sense to have update policy pool? 
-       Usually once the policy is listed, isnt the total insurance coverage/pool fixed? */
+       Usually once the policy is listed, isnt the total insurance coverage/pool fixed? Or are u saying after top up CS tokens, */
     function updatePolicyPoolValue(uint256 policyId, uint256 newPoolValue)
         external
     {
         Policy storage policy = policies[policyId];
-        require(policy.active, "Policy is not active");
+        require(block.timestamp <= (policy.creationTime + policy.coveragePeriod), "Policy is not active"); // check within active period
         require(policy.policyId == policyId, "Policy not found");
 
         policy.currPoolValue = newPoolValue;
