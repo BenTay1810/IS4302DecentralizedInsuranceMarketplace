@@ -102,17 +102,42 @@
 				"type": "event"
 			},
 			{
+				"anonymous": false,
 				"inputs": [
 					{
+						"indexed": false,
 						"internalType": "uint256",
-						"name": "amount",
+						"name": "policyId",
 						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "listed",
+						"type": "string"
 					}
 				],
-				"name": "addCollateral",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
+				"name": "PolicyListed",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "delisted",
+						"type": "string"
+					}
+				],
+				"name": "PolicydeListed",
+				"type": "event"
 			},
 			{
 				"inputs": [],
@@ -250,19 +275,6 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint256",
-						"name": "policyId",
-						"type": "uint256"
-					}
-				],
-				"name": "changePolicyListedStatus",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
 						"internalType": "string",
 						"name": "_policyName",
 						"type": "string"
@@ -294,6 +306,19 @@
 					}
 				],
 				"name": "createNewPolicy",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					}
+				],
+				"name": "deListPolicy",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -419,6 +444,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					}
+				],
+				"name": "listPolicy",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "owner",
 				"outputs": [
@@ -473,24 +511,6 @@
 					}
 				],
 				"name": "transferOwnership",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "policyId",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "newPoolValue",
-						"type": "uint256"
-					}
-				],
-				"name": "updatePolicyPoolValue",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -762,11 +782,11 @@
 			]
 		},
 		"contracts/InsuranceCompany.sol": {
-			"keccak256": "0xe32796b012e040bfd9bd9861895b82771e5cf5ffe3c3289f8cb81a60002b94f6",
+			"keccak256": "0x02f716c1f54b3965316169de9ab7821ef63914315fc5bdaec7e7bef2da6a362e",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://f9641b072cb9e3fcb386aaecabce115f011ce49831867f488d6ce1e4936b8b05",
-				"dweb:/ipfs/QmcU9W28adWHhAe5QQ3Y1DdLvtAmmjBgN8bKkwmuh3P75f"
+				"bzz-raw://fd58ef865a6a4613b434caafc2a5aac89d550dad336787175277ac7d80cd4851",
+				"dweb:/ipfs/QmayCXLCQ3ebkPu293JWvLTCHm2ZKwHWBRs2MMzwdDhP3D"
 			]
 		},
 		"https://github.com/0x00pluto/solidity-datetime/blob/master/contracts/DateTime.sol": {
