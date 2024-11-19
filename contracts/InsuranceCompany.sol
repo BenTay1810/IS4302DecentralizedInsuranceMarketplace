@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import ".deps/npm/@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol"; // for error specification
-
 import "./CSToken.sol";
 
-contract InsuranceCompany is Ownable {
+contract InsuranceCompany {
     CSToken public token;
     mapping(string => bool) private validPolicyTypes;
     uint256 timestamp = block.timestamp; // current time as timestamp
 
-    constructor(CSToken _token) Ownable(msg.sender) {
+    constructor(CSToken _token) {
         token = _token;
         validPolicyTypes["Travel"] = true;
         validPolicyTypes["Property"] = true;
@@ -35,6 +33,11 @@ contract InsuranceCompany is Ownable {
     // Modifier to check if the policy type is valid based on pre-defined 3 policy types
     modifier validPolicyType(string memory _policyType) {
         require(validPolicyTypes[_policyType], "Invalid policy type");
+        _;
+    }
+
+    modifier higherClaimBackRate(uint256 claimBackRate, address lister) {
+        require(claimBackRate > token.getUserConversionRate(lister), "Your claim back rate should be higher than your conversion rate");
         _;
     }
 
@@ -63,9 +66,27 @@ contract InsuranceCompany is Ownable {
     uint256 public policyCount;
 
     mapping(uint256 => Policy) policies;
+    // Mapping from lister's address to a list of policy IDs
+    mapping(address => uint256[]) public listerPolicies;
+
 
     event PolicyCreated(uint256 policyId, string policyName, address creator);
     event PolicyClaimed(uint256 policyId, uint256 claimValue); 
+    // Define an event to log policy details
+    event PolicyDetails(
+        uint256 policyId,
+        string policyName,
+        string policyType,
+        uint256 claimBackRate,
+        uint256 maxPoolValue,
+        uint256 currPoolValue,
+        uint256 minStake,
+        uint256 creationTime,
+        uint coveragePeriod,
+        address creator,
+        bool listed
+    );
+
     event PolicyListed(uint256 policyId, string listed);
     event PolicydeListed(uint256 policyId, string delisted);
 
@@ -98,7 +119,7 @@ contract InsuranceCompany is Ownable {
         uint256 _maxPoolValue,
         uint256 _minStake, // min amount of tokens (premium) that a buyer must pay to get a share of being insured under the policy
         uint _coveragePeriod // default this to days
-    ) external checkEnoughTokenBal(_maxPoolValue) validPolicyType(_policyType) {
+    ) external checkEnoughTokenBal(_maxPoolValue) validPolicyType(_policyType) higherClaimBackRate(_claimBackRate, msg.sender){
         require(
            
             token.balanceOf(address(msg.sender)) > calculateAllNetClaimValue(),
@@ -123,9 +144,42 @@ contract InsuranceCompany is Ownable {
             listed: false
         });
 
+
+        // Track the policy ID under the lister's address
+        listerPolicies[msg.sender].push(policyCount);
+
         emit PolicyCreated(policyCount, _policyName, msg.sender);
     }
 
+    // Function to get the details of all policies created by a lister either from policy side or marketplace
+    function getListerPolicyDetails(address _lister) public 
+    {
+        uint256[] memory policyIds = listerPolicies[_lister];
+        require(policyIds.length > 0, "Lister has not created any policies");
+
+        for (uint256 i = 0; i < policyIds.length; i++) {
+            uint256 policyId = policyIds[i];
+            Policy memory policy = policies[policyId];
+
+            // Emit the event with pretty data
+            emit PolicyDetails(
+                policy.policyId,
+                policy.policyName,
+                policy.policyType,
+                policy.claimBackRate,
+                policy.maxPoolValue,
+                policy.currPoolValue,
+                policy.minStake,
+                policy.creationTime,
+                policy.coveragePeriod,
+                policy.creator,
+                policy.listed
+            );
+        }
+    }
+            
+
+    // For usage by marketplace
     function getPolicy(uint256 policyId) external view returns (Policy memory) {
         require(policyId > 0 && policyId <= policyCount, "Invalid policy ID");
         return policies[policyId];
@@ -158,9 +212,6 @@ contract InsuranceCompany is Ownable {
         emit PolicydeListed(policyId, "Policy has been delisted successfully!");
     }
 
-    /* Im guessing this should be a private function as previously discussed where we check
-       if there is enough tokens left to fulfill the next min token transaction 
-       Ie. if curr pool value = 90, min stake = 100, shd delist but remain active */
     function changePolicyListedStatus(uint256 policyId) internal {
         Policy storage policy = policies[policyId];
         require(policy.policyId == policyId, "Policy not found");

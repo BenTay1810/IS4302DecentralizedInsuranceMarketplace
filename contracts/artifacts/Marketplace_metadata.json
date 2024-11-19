@@ -63,59 +63,125 @@
 				"name": "policyHolders",
 				"outputs": [
 					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "policyId",
+								"type": "uint256"
+							},
+							{
+								"internalType": "string",
+								"name": "policyName",
+								"type": "string"
+							},
+							{
+								"internalType": "string",
+								"name": "policyType",
+								"type": "string"
+							},
+							{
+								"internalType": "uint256",
+								"name": "claimBackRate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "maxPoolValue",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "currPoolValue",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "minStake",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "creationTime",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "coveragePeriod",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "creator",
+								"type": "address"
+							},
+							{
+								"internalType": "bool",
+								"name": "listed",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct InsuranceCompany.Policy",
+						"name": "boughtPolicy",
+						"type": "tuple"
+					},
+					{
 						"internalType": "uint256",
-						"name": "policyId",
+						"name": "coverageStartTimestamp",
 						"type": "uint256"
 					},
 					{
-						"internalType": "string",
-						"name": "policyName",
-						"type": "string"
-					},
-					{
-						"internalType": "string",
-						"name": "policyType",
-						"type": "string"
-					},
-					{
 						"internalType": "uint256",
-						"name": "claimBackRate",
+						"name": "coverageEndTimestamp",
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint256",
-						"name": "maxPoolValue",
-						"type": "uint256"
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "year",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "month",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "day",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct Marketplace.Date",
+						"name": "coverageStartDate",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "year",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "month",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "day",
+								"type": "uint256"
+							}
+						],
+						"internalType": "struct Marketplace.Date",
+						"name": "coverageEndDate",
+						"type": "tuple"
 					},
 					{
 						"internalType": "uint256",
-						"name": "currPoolValue",
+						"name": "ownedCSTokens",
 						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "minStake",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "creationTime",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "coveragePeriod",
-						"type": "uint256"
-					},
-					{
-						"internalType": "address",
-						"name": "creator",
-						"type": "address"
-					},
-					{
-						"internalType": "bool",
-						"name": "listed",
-						"type": "bool"
 					}
 				],
 				"stateMutability": "view",
@@ -193,67 +259,133 @@
 			},
 			{
 				"inputs": [],
-				"name": "viewMyActivePolicies",
+				"name": "viewMyBoughtPolicies",
 				"outputs": [
 					{
 						"components": [
 							{
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "policyId",
+										"type": "uint256"
+									},
+									{
+										"internalType": "string",
+										"name": "policyName",
+										"type": "string"
+									},
+									{
+										"internalType": "string",
+										"name": "policyType",
+										"type": "string"
+									},
+									{
+										"internalType": "uint256",
+										"name": "claimBackRate",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "maxPoolValue",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "currPoolValue",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "minStake",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "creationTime",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "coveragePeriod",
+										"type": "uint256"
+									},
+									{
+										"internalType": "address",
+										"name": "creator",
+										"type": "address"
+									},
+									{
+										"internalType": "bool",
+										"name": "listed",
+										"type": "bool"
+									}
+								],
+								"internalType": "struct InsuranceCompany.Policy",
+								"name": "boughtPolicy",
+								"type": "tuple"
+							},
+							{
 								"internalType": "uint256",
-								"name": "policyId",
+								"name": "coverageStartTimestamp",
 								"type": "uint256"
 							},
 							{
-								"internalType": "string",
-								"name": "policyName",
-								"type": "string"
-							},
-							{
-								"internalType": "string",
-								"name": "policyType",
-								"type": "string"
-							},
-							{
 								"internalType": "uint256",
-								"name": "claimBackRate",
+								"name": "coverageEndTimestamp",
 								"type": "uint256"
 							},
 							{
-								"internalType": "uint256",
-								"name": "maxPoolValue",
-								"type": "uint256"
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "year",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "month",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "day",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct Marketplace.Date",
+								"name": "coverageStartDate",
+								"type": "tuple"
+							},
+							{
+								"components": [
+									{
+										"internalType": "uint256",
+										"name": "year",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "month",
+										"type": "uint256"
+									},
+									{
+										"internalType": "uint256",
+										"name": "day",
+										"type": "uint256"
+									}
+								],
+								"internalType": "struct Marketplace.Date",
+								"name": "coverageEndDate",
+								"type": "tuple"
 							},
 							{
 								"internalType": "uint256",
-								"name": "currPoolValue",
+								"name": "ownedCSTokens",
 								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "minStake",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "creationTime",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "coveragePeriod",
-								"type": "uint256"
-							},
-							{
-								"internalType": "address",
-								"name": "creator",
-								"type": "address"
-							},
-							{
-								"internalType": "bool",
-								"name": "listed",
-								"type": "bool"
 							}
 						],
-						"internalType": "struct InsuranceCompany.Policy[]",
+						"internalType": "struct Marketplace.BuyerPolicy[]",
 						"name": "",
 						"type": "tuple[]"
 					}
@@ -498,27 +630,27 @@
 			]
 		},
 		"contracts/CSToken.sol": {
-			"keccak256": "0x3aa511e9439ffb3a280dcb3d4a95bbb27966173c5acfff115714f05e36a7d971",
+			"keccak256": "0xfd5d1db924b1ff2905179c49888e0db08c4371ea323d166ea0a5f1cfbd2510b7",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a17be82e82873bb7bb69bda8e7177b9e03376d9da91ae1695cd0aa6acd77719a",
-				"dweb:/ipfs/QmTaaQBzNuk3SyXpWxTo8a2x5ySwCHd4EQwXnqeyzYdWVD"
+				"bzz-raw://1e1aac60e80da714a7894ea6823b44aaf75a742ee0e3b2d8b44150b292dd15e8",
+				"dweb:/ipfs/QmdavgU1vfVJBMETkZXjt8D76Mk2DJ8f565pGzH4jszPwS"
 			]
 		},
 		"contracts/InsuranceCompany.sol": {
-			"keccak256": "0xd5d433d1cb6acc1251407426139c4ebf6000a6b3ae3430167eb5bc4f76ddc021",
+			"keccak256": "0x04fabd4ddeca46e1788f33892e92eb58dbc23077e1285e16787a9323aa68578f",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://efd86862f1e030c4820bdd8d0138e56c5218223d15bacc3bb65357d9f1f91eaf",
-				"dweb:/ipfs/QmfUukEeK6eXa5Tr2BRSyvpy23ocMdvXXoddgVcVT9LAdN"
+				"bzz-raw://54619182e74431be4e842f746e0abadaae1f89f3047f1986afad08da401c112a",
+				"dweb:/ipfs/QmcEUxhR5SEsrUKh8PVRZTuQmoewLNNV6bz9fVNvJ5pBkB"
 			]
 		},
 		"contracts/Marketplace.sol": {
-			"keccak256": "0x2740ac12d66551589b70ab6575ca784b33e369d51f40d6ca0ef9dcd83e9a7b5e",
+			"keccak256": "0x95b34168d468bf64a002eea30a406b69ba3af85a7c58afd39ccab57629668ebd",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://19f65c022df7781a8561472c6a8df4f9dbcc20c9736273b67622db8703374399",
-				"dweb:/ipfs/QmZwhrb1SJtzswiA5EewT5pXSAn9fMH8vN392fXGDmwYjz"
+				"bzz-raw://37f63469aac08d87093fb9ab8f8ab94b87090d8ec5aba2a62553bb831f340a29",
+				"dweb:/ipfs/QmXCnV1iHRTHVvZcebg8qXoAdKuekJva4Gp9zaDNbqv91d"
 			]
 		},
 		"https://github.com/0x00pluto/solidity-datetime/blob/master/contracts/DateTime.sol": {

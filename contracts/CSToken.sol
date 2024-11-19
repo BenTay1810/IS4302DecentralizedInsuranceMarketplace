@@ -99,12 +99,12 @@ contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
         emit UserTokenInfo(msg.sender, currentTokensRemaining, remainingCollateral, storedConversionRate);
     }
 
-    function getUserCollateral() public view mustBeTokenOwner returns (uint256) {
-        return collateral[msg.sender];
+    function getUserCollateral(address lister) external view returns (uint256) {
+        return collateral[lister];
     }
 
-    function getUserConversionRate() public view mustBeTokenOwner returns (uint256) {
-        return userConversionRate[msg.sender];
+    function getUserConversionRate(address lister) external view returns (uint256) {
+        return userConversionRate[lister];
     }
 
     // should this be public? i feel like it should be handled by the marketplace contract only to burn

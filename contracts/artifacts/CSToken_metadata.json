@@ -548,7 +548,13 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "lister",
+						"type": "address"
+					}
+				],
 				"name": "getUserCollateral",
 				"outputs": [
 					{
@@ -561,7 +567,13 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "lister",
+						"type": "address"
+					}
+				],
 				"name": "getUserConversionRate",
 				"outputs": [
 					{
@@ -1204,11 +1216,11 @@
 			]
 		},
 		"contracts/CSToken.sol": {
-			"keccak256": "0x3aa511e9439ffb3a280dcb3d4a95bbb27966173c5acfff115714f05e36a7d971",
+			"keccak256": "0xfd5d1db924b1ff2905179c49888e0db08c4371ea323d166ea0a5f1cfbd2510b7",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a17be82e82873bb7bb69bda8e7177b9e03376d9da91ae1695cd0aa6acd77719a",
-				"dweb:/ipfs/QmTaaQBzNuk3SyXpWxTo8a2x5ySwCHd4EQwXnqeyzYdWVD"
+				"bzz-raw://1e1aac60e80da714a7894ea6823b44aaf75a742ee0e3b2d8b44150b292dd15e8",
+				"dweb:/ipfs/QmdavgU1vfVJBMETkZXjt8D76Mk2DJ8f565pGzH4jszPwS"
 			]
 		}
 	},

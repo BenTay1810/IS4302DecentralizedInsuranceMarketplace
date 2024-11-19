@@ -140,6 +140,32 @@
 				"type": "event"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					}
+				],
+				"name": "_deListPolicy",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					}
+				],
+				"name": "_listPolicy",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "calculateAllNetClaimValue",
 				"outputs": [
@@ -200,50 +226,6 @@
 								"internalType": "uint256",
 								"name": "coveragePeriod",
 								"type": "uint256"
-							},
-							{
-								"components": [
-									{
-										"internalType": "uint256",
-										"name": "year",
-										"type": "uint256"
-									},
-									{
-										"internalType": "uint256",
-										"name": "month",
-										"type": "uint256"
-									},
-									{
-										"internalType": "uint256",
-										"name": "day",
-										"type": "uint256"
-									}
-								],
-								"internalType": "struct InsuranceCompany.Date",
-								"name": "creationDate",
-								"type": "tuple"
-							},
-							{
-								"components": [
-									{
-										"internalType": "uint256",
-										"name": "year",
-										"type": "uint256"
-									},
-									{
-										"internalType": "uint256",
-										"name": "month",
-										"type": "uint256"
-									},
-									{
-										"internalType": "uint256",
-										"name": "day",
-										"type": "uint256"
-									}
-								],
-								"internalType": "struct InsuranceCompany.Date",
-								"name": "coverageEndDate",
-								"type": "tuple"
 							},
 							{
 								"internalType": "address",
@@ -318,19 +300,6 @@
 						"type": "uint256"
 					}
 				],
-				"name": "deListPolicy",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "policyId",
-						"type": "uint256"
-					}
-				],
 				"name": "getPolicy",
 				"outputs": [
 					{
@@ -381,50 +350,6 @@
 								"type": "uint256"
 							},
 							{
-								"components": [
-									{
-										"internalType": "uint256",
-										"name": "year",
-										"type": "uint256"
-									},
-									{
-										"internalType": "uint256",
-										"name": "month",
-										"type": "uint256"
-									},
-									{
-										"internalType": "uint256",
-										"name": "day",
-										"type": "uint256"
-									}
-								],
-								"internalType": "struct InsuranceCompany.Date",
-								"name": "creationDate",
-								"type": "tuple"
-							},
-							{
-								"components": [
-									{
-										"internalType": "uint256",
-										"name": "year",
-										"type": "uint256"
-									},
-									{
-										"internalType": "uint256",
-										"name": "month",
-										"type": "uint256"
-									},
-									{
-										"internalType": "uint256",
-										"name": "day",
-										"type": "uint256"
-									}
-								],
-								"internalType": "struct InsuranceCompany.Date",
-								"name": "coverageEndDate",
-								"type": "tuple"
-							},
-							{
 								"internalType": "address",
 								"name": "creator",
 								"type": "address"
@@ -441,19 +366,6 @@
 					}
 				],
 				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "policyId",
-						"type": "uint256"
-					}
-				],
-				"name": "listPolicy",
-				"outputs": [],
-				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -511,6 +423,24 @@
 					}
 				],
 				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "newPoolValue",
+						"type": "uint256"
+					}
+				],
+				"name": "updatePolicyPoolValue",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -782,19 +712,11 @@
 			]
 		},
 		"contracts/InsuranceCompany.sol": {
-			"keccak256": "0x02f716c1f54b3965316169de9ab7821ef63914315fc5bdaec7e7bef2da6a362e",
+			"keccak256": "0xc40e309c4b0bcc0c9fc59c4f41b4562b5c12b60067cdc64758bfc5b2d069b7e1",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://fd58ef865a6a4613b434caafc2a5aac89d550dad336787175277ac7d80cd4851",
-				"dweb:/ipfs/QmayCXLCQ3ebkPu293JWvLTCHm2ZKwHWBRs2MMzwdDhP3D"
-			]
-		},
-		"https://github.com/0x00pluto/solidity-datetime/blob/master/contracts/DateTime.sol": {
-			"keccak256": "0x3e6031d05cd13aa1ea1bcaf59d6a4b20054ddc18a86514e44e66cd4ed4dc4445",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://2ce88e00d8a888f45bcf3ef95df7bcf8b90b97e4465b0427ba3407e3d19dc931",
-				"dweb:/ipfs/QmWwtMzN9fpxWF3RvhzsPFjQCsmiKhWV7LMKngKj5Xu3ne"
+				"bzz-raw://987ab60767e21e838206c099b71a99603eee7bdcf78a1bfd1bff0374eb8a4015",
+				"dweb:/ipfs/QmaAtiyYd8eu2kL9f3MtWEXyrtW3ffzaoB7HSTBPq1nuDU"
 			]
 		}
 	},
