@@ -5,7 +5,7 @@ import ".deps/npm/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import ".deps/npm/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import ".deps/npm/@openzeppelin/contracts/access/Ownable.sol";
 import ".deps/npm/@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
-import "@openzeppelin/contracts/utils/Strings.sol"; // for error specification
+import ".deps/npm/@openzeppelin/contracts/utils/Strings.sol"; // for error specification
 
 
 contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
@@ -111,5 +111,10 @@ contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
     // should this be public? i feel like it should be handled by the marketplace contract only to burn
     function burn(uint256 amount) public override {
         _burn(msg.sender, amount);
+    }
+    function transferCollateral(address to, uint256 amount) external onlyOwner {
+        require(collateral[msg.sender] >= amount, "Insufficient collateral balance.");
+        collateral[msg.sender] -= amount;
+        payable(to).transfer(amount);
     }
 }

@@ -3,9 +3,8 @@ pragma solidity ^0.8.20;
 
 import "./CSToken.sol";
 import "./InsuranceCompany.sol";
-import "https://github.com/0x00pluto/solidity-datetime/blob/master/contracts/DateTime.sol"; // for date time
-import "@openzeppelin/contracts/utils/Strings.sol"; // for error specification
-
+import ".deps/github/0x00pluto/solidity-datetime/contracts/DateTime.sol"; // for date time
+import ".deps/npm/@openzeppelin/contracts/utils/Strings.sol"; // for error specification
 
 contract Marketplace {
     CSToken token;
@@ -18,16 +17,31 @@ contract Marketplace {
     }
 
     modifier isActive(uint256 policyId) {
-        InsuranceCompany.Policy memory policy = company.getPolicy(policyId);
-        require(currentTimestamp <= (policy.creationTime + policy.coveragePeriod));
+        bool active = false;
+        for (uint256 i = 0; i < policyHolders[msg.sender].length; i++) {
+            if (policyHolders[msg.sender][i].boughtPolicy.policyId == policyId) {
+                BuyerPolicy memory bp = policyHolders[msg.sender][i];
+                require(bp.coverageEndTimestamp > block.timestamp);
+                active = true;
+                break;
+            }
+        }
+        require(active, "This policy is not active.");
         _;
     }
+
 
     modifier mustOwnPolicy(uint256 policyId) {
         InsuranceCompany.Policy memory policy = company.getPolicy(policyId);
         require(msg.sender == policy.creator, "You do not own this policy");
         _;
     }
+
+    modifier isPolicyHolder() {
+        require(policyHolders[msg.sender].length > 0, "You are not a policyholder");
+        _;
+    }
+
 
     struct Date {
         uint256 year;
@@ -37,23 +51,28 @@ contract Marketplace {
 
     // Struct to hold all information about a policy bought by a buyer, including coverage details
     struct BuyerPolicy {
-        InsuranceCompany.Policy boughtPolicy;           // The full policy details
+        InsuranceCompany.Policy boughtPolicy; // The full policy details
         uint256 coverageStartTimestamp; // Coverage start timestamp (when the buyer purchases)
-        uint256 coverageEndTimestamp;   // Coverage end timestamp (calculated based on coverage period)
-        Date coverageStartDate;         // Coverage start date (human-readable)
-        Date coverageEndDate;           // Coverage end date (human-readable)
+        uint256 coverageEndTimestamp; // Coverage end timestamp (calculated based on coverage period)
+        Date coverageStartDate; // Coverage start date (human-readable)
+        Date coverageEndDate; // Coverage end date (human-readable)
         uint256 ownedCSTokens;
     }
 
     event TokensListed(address indexed creator, uint256 amount);
+    event PolicyBought(
+        address indexed buyer,           
+        uint256 indexed policyId, 
+        Date coverageStartTimestamp,   
+        Date coverageEndTimestamp,   
+        uint256 ownedCSTokens 
+    );
+    event PolicyClaimed(uint256 policyId, uint256 claimAmount);
     mapping(uint256 => uint256) public policyDeposits; // Tracks tokens deposited for each policy
     mapping(address => BuyerPolicy[]) public policyHolders;
 
     function listPolicy(uint256 policyId) public mustOwnPolicy(policyId) {
         InsuranceCompany.Policy memory listedPolicy = company.getPolicy(policyId);
-
-        uint256 balance = token.balanceOf(msg.sender);
-        require(balance >= listedPolicy.maxPoolValue, "Insufficient token balance.");
 
         // Check if the user has approved the Marketplace to spend tokens on their behalf
         uint256 allowance = token.allowance(msg.sender, address(this));
@@ -61,15 +80,19 @@ contract Marketplace {
             allowance >= listedPolicy.maxPoolValue,
             string(
                 abi.encodePacked(
-                    "You need to approve the marketplace to spend ", 
-                    Strings.toString(listedPolicy.maxPoolValue), 
+                    "You need to approve the marketplace to spend ",
+                    Strings.toString(listedPolicy.maxPoolValue),
                     " max pool value tokens on your behalf for this policy."
                 )
             )
         );
 
         // Transfer tokens directly to the Marketplace contract
-        bool success = token.transferFrom(msg.sender, address(this), listedPolicy.maxPoolValue);
+        bool success = token.transferFrom(
+            msg.sender,
+            address(this),
+            listedPolicy.maxPoolValue
+        );
         require(success, "Token transfer failed.");
 
         // Track the deposit for this policy
@@ -80,7 +103,10 @@ contract Marketplace {
         company._listPolicy(policyId);
     }
 
-    function viewListedPolicies() external view returns (InsuranceCompany.Policy[] memory)
+    function viewListedPolicies()
+        external
+        view
+        returns (InsuranceCompany.Policy[] memory)
     {
         uint256 totalPolicies = company.policyCount();
         uint256 listedCount = 0;
@@ -94,10 +120,15 @@ contract Marketplace {
         }
 
         // Ensure at least one listed policy exists
-        require(listedCount > 0, "There are currently no listed policies to buy");
+        require(
+            listedCount > 0,
+            "There are currently no listed policies to buy"
+        );
 
         // Create an array for the listed policies
-        InsuranceCompany.Policy[] memory listed = new InsuranceCompany.Policy[](listedCount);
+        InsuranceCompany.Policy[] memory listed = new InsuranceCompany.Policy[](
+            listedCount
+        );
         uint256 index = 0;
 
         // Add the listed policies to the array
@@ -157,61 +188,141 @@ contract Marketplace {
         uint256 coverageEndTimestamp = block.timestamp + policy.coveragePeriod;
 
         Date memory coverageStartDate;
-        (coverageStartDate.year, coverageStartDate.month, coverageStartDate.day) = DateTime.timestampToDate(coverageStartTimestamp);
+        (
+            coverageStartDate.year,
+            coverageStartDate.month,
+            coverageStartDate.day
+        ) = DateTime.timestampToDate(coverageStartTimestamp);
+        
         Date memory coverageEndDate;
-        (coverageEndDate.year, coverageEndDate.month, coverageEndDate.day) = DateTime.timestampToDate(coverageEndTimestamp);
-
+        (
+            coverageEndDate.year,
+            coverageEndDate.month,
+            coverageEndDate.day
+        ) = DateTime.timestampToDate(coverageEndTimestamp);
 
         // Create a new BuyerPolicy struct with coverage dates
         BuyerPolicy memory buyerPolicy = BuyerPolicy({
-            boughtPolicy: policy,  // The Policy that the buyer is purchasing
+            boughtPolicy: policy, // The Policy that the buyer is purchasing
             coverageStartTimestamp: coverageStartTimestamp,
             coverageEndTimestamp: coverageEndTimestamp,
             coverageStartDate: coverageStartDate,
             coverageEndDate: coverageEndDate,
-            ownedCSTokens: policy.minStake
+            ownedCSTokens: msg.value / token.getUserConversionRate(policy.creator)
         });
 
-
         // Ensure the policy has enough tokens deposited
-        require(policyDeposits[policyId] >= requiredValue, "Insufficient tokens in policy deposit.");
+        require(policyDeposits[policyId] >= msg.value / token.getUserConversionRate(policy.creator), "Insufficient tokens in policy deposit.");
 
         // Transfer tokens from Marketplace to buyer
-        token.transfer(msg.sender, requiredValue);
+        token.transfer(msg.sender, msg.value / token.getUserConversionRate(policy.creator));
 
         // Deduct from the policy deposit
-        policyDeposits[policyId] -= requiredValue;
+        policyDeposits[policyId] -= msg.value / token.getUserConversionRate(policy.creator);
 
         // Add the buyer's policy to their list of purchased policies
         policyHolders[msg.sender].push(buyerPolicy);
 
-
         company.updatePolicyPoolValue(
             policyId,
-            policy.currPoolValue + policy.minStake
+            policy.currPoolValue + (msg.value / token.getUserConversionRate(policy.creator))
         );
 
-         // Auto-delisting after updating policy pool value
+        // Auto-delisting after updating policy pool value
         if (policy.maxPoolValue - policy.currPoolValue < policy.minStake) {
             delistPolicy(policyId);
         }
 
+        emit PolicyBought(
+            msg.sender,
+            policyId,
+            coverageStartDate,
+            coverageEndDate,
+            policy.minStake
+        );
     }
 
-    function viewMyBoughtPolicies() external view returns (BuyerPolicy[] memory) 
+
+    function claimPolicy(uint256 policyId) external isPolicyHolder isActive(policyId) {
+        bool ownsPolicy = false;
+        uint256 index = 0;
+        for (uint256 i = 0; i < policyHolders[msg.sender].length; i++) {
+            if (policyHolders[msg.sender][i].boughtPolicy.policyId == policyId) {
+                ownsPolicy = true;
+                index = i;
+                break;
+            }
+        }
+
+        require(ownsPolicy == true, "You have not bought this policy!");
+
+        uint256 ownedTokens = policyHolders[msg.sender][index].ownedCSTokens;
+        require(ownedTokens > 0, "You do not own tokens for this policy!");
+        
+        InsuranceCompany.Policy memory policy = company.getPolicy(policyId);
+
+        // Calculate the total claim amount in Wei based on the claim back rate
+        uint256 totalClaimableWei = ownedTokens * policy.claimBackRate;
+
+        // Get the Marketplace's available tokens for this policy
+        uint256 availableTokens = policyDeposits[policyId];
+        uint256 marketplaceClaimableWei = availableTokens * policy.claimBackRate;
+
+        // Transfer as much as possible from the Marketplace
+        uint256 weiToTransferFromMarketplace;
+        if (marketplaceClaimableWei >= totalClaimableWei) {
+            // Marketplace has sufficient funds to cover the claim
+            weiToTransferFromMarketplace = totalClaimableWei;
+
+            // Deduct tokens from the policy deposit
+            policyDeposits[policyId] -= ownedTokens;
+        } else {
+            // Marketplace cannot fully cover the claim, calculate the shortfall
+            weiToTransferFromMarketplace = marketplaceClaimableWei;
+            uint256 shortfallWei = totalClaimableWei - weiToTransferFromMarketplace;
+
+            // Deduct all remaining tokens from the Marketplace
+            policyDeposits[policyId] = 0;
+
+            // Transfer the remaining shortfall from the policy creator
+            require(
+                address(policy.creator).balance >= shortfallWei,
+                "Policy creator cannot cover the shortfall!"
+            );
+            payable(msg.sender).transfer(shortfallWei);
+        }
+
+        // Transfer the Wei from the Marketplace
+        if (weiToTransferFromMarketplace > 0) {
+            payable(msg.sender).transfer(weiToTransferFromMarketplace);
+        }
+
+        // Emit event for successful claim
+        emit PolicyClaimed(policyId, totalClaimableWei);
+    }
+
+    function viewMyBoughtPolicies()
+        external isPolicyHolder
+        view
+        returns (BuyerPolicy[] memory)
     {
         // Check if the caller has any active policies
-        require(policyHolders[msg.sender].length > 0, "You don't own any policies");
+        require(
+            policyHolders[msg.sender].length > 0,
+            "You don't own any policies"
+        );
 
         // Create an array to store the complete BuyerPolicy structs (not just Policy)
-        BuyerPolicy[] memory buyerPolicies = new BuyerPolicy[](policyHolders[msg.sender].length);
+        BuyerPolicy[] memory buyerPolicies = new BuyerPolicy[](
+            policyHolders[msg.sender].length
+        );
 
         // Loop through the buyer's policies and store the full BuyerPolicy struct
         for (uint256 i = 0; i < policyHolders[msg.sender].length; i++) {
             buyerPolicies[i] = policyHolders[msg.sender][i]; // Extract the full BuyerPolicy struct
         }
 
-        return buyerPolicies;  // Return the array of full BuyerPolicy structs
+        return buyerPolicies; // Return the array of full BuyerPolicy structs
     }
 
     function delistPolicy(uint256 policyId) private {
