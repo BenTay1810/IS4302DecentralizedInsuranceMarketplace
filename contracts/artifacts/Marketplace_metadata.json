@@ -22,6 +22,25 @@
 				"type": "constructor"
 			},
 			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "creator",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "TokensListed",
+				"type": "event"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "uint256",
@@ -45,6 +64,25 @@
 				"name": "listPolicy",
 				"outputs": [],
 				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"name": "policyDeposits",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -630,11 +668,11 @@
 			]
 		},
 		"contracts/CSToken.sol": {
-			"keccak256": "0xfd5d1db924b1ff2905179c49888e0db08c4371ea323d166ea0a5f1cfbd2510b7",
+			"keccak256": "0xb34fd901ccb84e2394f9fe8539698a94d9661676b3a2b49154b54299c3061363",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://1e1aac60e80da714a7894ea6823b44aaf75a742ee0e3b2d8b44150b292dd15e8",
-				"dweb:/ipfs/QmdavgU1vfVJBMETkZXjt8D76Mk2DJ8f565pGzH4jszPwS"
+				"bzz-raw://338c898380df67d6fc295df0c28b18e1283906d068e863d3afa147702dd7f1a6",
+				"dweb:/ipfs/QmdDhHeqbBvQA6ctYx4gUsTEmvrNQTZx7yCnUbxDKQWD5L"
 			]
 		},
 		"contracts/InsuranceCompany.sol": {
@@ -646,11 +684,11 @@
 			]
 		},
 		"contracts/Marketplace.sol": {
-			"keccak256": "0x95b34168d468bf64a002eea30a406b69ba3af85a7c58afd39ccab57629668ebd",
+			"keccak256": "0x7525156e64f1b134636f1205b02f2925f73c504babdf4f120aca065a8d261b5e",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://37f63469aac08d87093fb9ab8f8ab94b87090d8ec5aba2a62553bb831f340a29",
-				"dweb:/ipfs/QmXCnV1iHRTHVvZcebg8qXoAdKuekJva4Gp9zaDNbqv91d"
+				"bzz-raw://36d242c0f363a5134f1839776910ba57f89d57f9bb7501cf5f0a1b104c1a59da",
+				"dweb:/ipfs/QmWFFgnxYV2ZmcnTh4QtCwiRaSRKDDWcxdNr5CcpEmL93y"
 			]
 		},
 		"https://github.com/0x00pluto/solidity-datetime/blob/master/contracts/DateTime.sol": {

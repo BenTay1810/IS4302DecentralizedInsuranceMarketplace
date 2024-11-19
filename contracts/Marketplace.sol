@@ -17,8 +17,6 @@ contract Marketplace {
         company = _company;
     }
 
-    mapping(address => BuyerPolicy[]) public policyHolders;
-
     modifier isActive(uint256 policyId) {
         InsuranceCompany.Policy memory policy = company.getPolicy(policyId);
         require(currentTimestamp <= (policy.creationTime + policy.coveragePeriod));
@@ -47,12 +45,39 @@ contract Marketplace {
         uint256 ownedCSTokens;
     }
 
+    event TokensListed(address indexed creator, uint256 amount);
+    mapping(uint256 => uint256) public policyDeposits; // Tracks tokens deposited for each policy
+    mapping(address => BuyerPolicy[]) public policyHolders;
 
     function listPolicy(uint256 policyId) public mustOwnPolicy(policyId) {
         InsuranceCompany.Policy memory listedPolicy = company.getPolicy(policyId);
-        // Allow the marketplace contract to spend up to `policy.minStake` tokens on behalf of the lister
-        token.approve(address(this), listedPolicy.maxPoolValue); 
-        company._listPolicy(policyId);  // Mark the policy as listed
+
+        uint256 balance = token.balanceOf(msg.sender);
+        require(balance >= listedPolicy.maxPoolValue, "Insufficient token balance.");
+
+        // Check if the user has approved the Marketplace to spend tokens on their behalf
+        uint256 allowance = token.allowance(msg.sender, address(this));
+        require(
+            allowance >= listedPolicy.maxPoolValue,
+            string(
+                abi.encodePacked(
+                    "You need to approve the marketplace to spend ", 
+                    Strings.toString(listedPolicy.maxPoolValue), 
+                    " max pool value tokens on your behalf for this policy."
+                )
+            )
+        );
+
+        // Transfer tokens directly to the Marketplace contract
+        bool success = token.transferFrom(msg.sender, address(this), listedPolicy.maxPoolValue);
+        require(success, "Token transfer failed.");
+
+        // Track the deposit for this policy
+        policyDeposits[policyId] = listedPolicy.maxPoolValue;
+
+        emit TokensListed(msg.sender, listedPolicy.maxPoolValue);
+
+        company._listPolicy(policyId);
     }
 
     function viewListedPolicies() external view returns (InsuranceCompany.Policy[] memory)
@@ -148,14 +173,14 @@ contract Marketplace {
         });
 
 
-        //   // Ensure the policy creator has approved the marketplace contract to spend the tokens
-        // uint256 allowanceAmount = token.allowance(policy.creator, address(this));
+        // Ensure the policy has enough tokens deposited
+        require(policyDeposits[policyId] >= requiredValue, "Insufficient tokens in policy deposit.");
 
-        // // Ensure the allowance is sufficient
-        // require(allowanceAmount >= policy.minStake, "Insufficient allowance for transfer");
+        // Transfer tokens from Marketplace to buyer
+        token.transfer(msg.sender, requiredValue);
 
-        // // Transfer CS tokens from policy creator to buyer
-        // token.transferFrom(policy.creator, msg.sender, policy.minStake);
+        // Deduct from the policy deposit
+        policyDeposits[policyId] -= requiredValue;
 
         // Add the buyer's policy to their list of purchased policies
         policyHolders[msg.sender].push(buyerPolicy);

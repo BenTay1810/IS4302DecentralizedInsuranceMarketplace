@@ -1216,11 +1216,11 @@
 			]
 		},
 		"contracts/CSToken.sol": {
-			"keccak256": "0xfd5d1db924b1ff2905179c49888e0db08c4371ea323d166ea0a5f1cfbd2510b7",
+			"keccak256": "0xb34fd901ccb84e2394f9fe8539698a94d9661676b3a2b49154b54299c3061363",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://1e1aac60e80da714a7894ea6823b44aaf75a742ee0e3b2d8b44150b292dd15e8",
-				"dweb:/ipfs/QmdavgU1vfVJBMETkZXjt8D76Mk2DJ8f565pGzH4jszPwS"
+				"bzz-raw://338c898380df67d6fc295df0c28b18e1283906d068e863d3afa147702dd7f1a6",
+				"dweb:/ipfs/QmdDhHeqbBvQA6ctYx4gUsTEmvrNQTZx7yCnUbxDKQWD5L"
 			]
 		}
 	},

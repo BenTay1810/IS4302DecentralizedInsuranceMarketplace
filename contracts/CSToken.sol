@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/utils/Strings.sol"; // for error specification
 
 contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
     uint256 private remainingCollateral;
+    
 
     mapping(address => uint256) public collateral;  // Tracks ether collateral per user
     mapping(address => uint256) public userConversionRate;  // Tracks conversion rate per user
