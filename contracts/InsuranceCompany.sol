@@ -126,6 +126,8 @@ contract InsuranceCompany {
         uint _coveragePeriod // Specifies the coverage duration for a policy buyer, starting from the purchase date, in days.
     ) external checkEnoughTokenBal(_maxPoolValue) validPolicyType(_policyType) higherClaimBackRate(_claimBackRate, msg.sender){
 
+        policyCount++;
+
         Policy memory createdPolicy = Policy({
             policyId: policyCount,
             policyName: _policyName,
@@ -159,8 +161,6 @@ contract InsuranceCompany {
 
         emit CheckSufficientCollateral(msg.sender, token.getUserCollateral(msg.sender), totalNetClaimValue);
 
-
-        policyCount++;
 
         // Associate the policyId with the newly created policy in policies mapping
         policies[policyCount] = createdPolicy;

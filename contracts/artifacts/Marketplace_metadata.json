@@ -652,11 +652,11 @@
 			]
 		},
 		"contracts/InsuranceCompany.sol": {
-			"keccak256": "0x8f3a6501f62e4bb4850cf06fa3c8760174e3d0a1884f3da2b7bd333122055297",
+			"keccak256": "0xca5f85fd892bb45dab8e2e61d4b288aeb496599a273717b670e8ae7715ff314e",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://8276fb6ebb5c6ea636b3a8f734c3ccb88adae21b3dc605082606813fdc6b1a89",
-				"dweb:/ipfs/QmYfogkngBdfizE3uv7TxwiJNq5b6Efk6TCFGZGvbsLmLN"
+				"bzz-raw://7797c7b62788be8e6f0b82ad5031dfc3a1ee75f03b9a3d3745f3d8d5a5b4166f",
+				"dweb:/ipfs/QmTyy6MTEo1mgAtNRooTVwVMYuEai6ZREuMFev3zCTbLGR"
 			]
 		},
 		"contracts/Marketplace.sol": {

@@ -38,7 +38,7 @@
 						"type": "uint256"
 					}
 				],
-				"name": "Debug",
+				"name": "CheckSufficientCollateral",
 				"type": "event"
 			},
 			{
@@ -596,11 +596,11 @@
 			]
 		},
 		"contracts/InsuranceCompany.sol": {
-			"keccak256": "0xf0f8a18feb6fe460bb56f379ae1237bce2ec83e0204ae44e651303f346f1c79a",
+			"keccak256": "0xa6504fa7f4689f8c17effcaffbef3459ae1c813989b1a1b6791c496f053e224d",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://33c067913b6fb85b4ecaef81fe9bcfe8ae13b3ccf0cccc8576af8b6ee887eeb9",
-				"dweb:/ipfs/QmQkxpkmMA1KQrsoVem77fDw6kcVhGeRTJs2DMhdCEFgEa"
+				"bzz-raw://f73a95e56df082aace506cbf4ec5a4d8c207a3412a0eb08561224358efacf861",
+				"dweb:/ipfs/QmPXArbtfEZjbB4cYsFARiPca2EENhwmXrCMc5GDRGqnPN"
 			]
 		}
 	},
