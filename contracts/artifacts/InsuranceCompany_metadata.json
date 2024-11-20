@@ -20,6 +20,31 @@
 				"anonymous": false,
 				"inputs": [
 					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "collateral",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "netClaimValue",
+						"type": "uint256"
+					}
+				],
+				"name": "Debug",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
 						"indexed": false,
 						"internalType": "uint256",
 						"name": "policyId",
@@ -571,11 +596,11 @@
 			]
 		},
 		"contracts/InsuranceCompany.sol": {
-			"keccak256": "0x8f3a6501f62e4bb4850cf06fa3c8760174e3d0a1884f3da2b7bd333122055297",
+			"keccak256": "0xf0f8a18feb6fe460bb56f379ae1237bce2ec83e0204ae44e651303f346f1c79a",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://8276fb6ebb5c6ea636b3a8f734c3ccb88adae21b3dc605082606813fdc6b1a89",
-				"dweb:/ipfs/QmYfogkngBdfizE3uv7TxwiJNq5b6Efk6TCFGZGvbsLmLN"
+				"bzz-raw://33c067913b6fb85b4ecaef81fe9bcfe8ae13b3ccf0cccc8576af8b6ee887eeb9",
+				"dweb:/ipfs/QmQkxpkmMA1KQrsoVem77fDw6kcVhGeRTJs2DMhdCEFgEa"
 			]
 		}
 	},

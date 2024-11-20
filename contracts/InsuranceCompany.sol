@@ -89,6 +89,12 @@ contract InsuranceCompany {
         bool listed
     );    
 
+    event CheckSufficientCollateral(
+        address indexed user,
+        uint256 collateral,
+        uint256 netClaimValue
+    );
+
     function calculateNetClaimValue(Policy memory p)
         public
         pure
@@ -119,16 +125,8 @@ contract InsuranceCompany {
         uint256 _minStake, // Min. amount of tokens (premium) that a buyer must pay to get a share of being insured under the policy
         uint _coveragePeriod // Specifies the coverage duration for a policy buyer, starting from the purchase date, in days.
     ) external checkEnoughTokenBal(_maxPoolValue) validPolicyType(_policyType) higherClaimBackRate(_claimBackRate, msg.sender){
-        require(
-            // Ensure the policy creator's collateral is sufficient to cover potential claimback costs for created policies
-            token.getUserCollateral(msg.sender) > calculateAllNetClaimValue(),
-            "Insufficient collateral: reduce the max pool value for this policy or top up more CS tokens to increase your collateral"
-        );
 
-        policyCount++;
-
-        // Associate the policyId with the newly created policy in policies mapping
-        policies[policyCount] = Policy({
+        Policy memory createdPolicy = Policy({
             policyId: policyCount,
             policyName: _policyName,
             policyType: _policyType,
@@ -141,6 +139,31 @@ contract InsuranceCompany {
             listed: false
         });
 
+        // Calculate the total net claim value of all existing policies
+        uint256 totalNetClaimValue = calculateAllNetClaimValue();
+        
+        // Calculate the net claim value of the new policy (this will be added to the total claim value)
+        uint256 newPolicyNetClaimValue = calculateNetClaimValue(createdPolicy);
+        
+        // Add the new policy's net claim value to the existing ones
+        totalNetClaimValue += newPolicyNetClaimValue;
+
+        // Get the policy creator's collateral
+        uint256 collateral = token.getUserCollateral(msg.sender);
+
+         // Check if the policy lister's collateral is enough to cover the total net claim value (existing + new policy) 
+        require(
+            collateral >= totalNetClaimValue,
+            "Insufficient collateral: reduce the max pool value for this policy or top up more CS tokens to increase your collateral"
+        );
+
+        emit CheckSufficientCollateral(msg.sender, token.getUserCollateral(msg.sender), totalNetClaimValue);
+
+
+        policyCount++;
+
+        // Associate the policyId with the newly created policy in policies mapping
+        policies[policyCount] = createdPolicy;
         // Track the policy ID under the lister's address
         listerPolicies[msg.sender].push(policyCount);
 
