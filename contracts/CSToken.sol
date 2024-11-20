@@ -3,15 +3,12 @@ pragma solidity ^0.8.20;
 
 import ".deps/npm/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import ".deps/npm/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import ".deps/npm/@openzeppelin/contracts/access/Ownable.sol";
-import ".deps/npm/@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import ".deps/npm/@openzeppelin/contracts/utils/Strings.sol"; // for error specification
 
 
-contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
+contract CSToken is ERC20, ERC20Burnable {
     uint256 private remainingCollateral;
     
-
     mapping(address => uint256) public collateral;  // Tracks ether collateral per user
     mapping(address => uint256) public userConversionRate;  // Tracks conversion rate per user
 
@@ -22,8 +19,6 @@ contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
 
     constructor() payable 
         ERC20("ChainSureToken", "CST")
-        Ownable(msg.sender)  // get rid?
-        ERC20Permit("ChainSureToken") // abstracts away complexity of manual approving of token transfer between contratcs
     {}
 
     modifier mustBeTokenOwner() {
@@ -66,7 +61,7 @@ contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
         emit Mint(msg.sender, amount, requiredCollateral); // Announce that you have minted how many tokens and collateral involved
     }
 
-    // For an insurance lister to top up existing CS tokens, they must stick with same conversion rate previously defined
+    // For a policy lister to top up existing CS tokens, they must stick with same conversion rate previously defined
     function topUpMyTokens(uint256 amount) public payable mustBeTokenOwner {
         uint256 storedConversionRate = userConversionRate[msg.sender];
         uint256 requiredCollateral = amount * storedConversionRate;
@@ -93,6 +88,7 @@ contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
         collateral[msg.sender] += requiredCollateral;  // Record the top up in collateral too
     }
 
+    // For policy lister to get their token and collateral information once they have minted some CS tokens
     function getMyTokenInformation() public mustBeTokenOwner {
         remainingCollateral = collateral[msg.sender];
         uint256 storedConversionRate = userConversionRate[msg.sender];
@@ -100,10 +96,12 @@ contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
         emit UserTokenInfo(msg.sender, currentTokensRemaining, remainingCollateral, storedConversionRate);
     }
 
+    // For use by insurance company contract
     function getUserCollateral(address lister) external view returns (uint256) {
         return collateral[lister];
     }
 
+    // For use by marketplace contract
     function getUserConversionRate(address lister) external view returns (uint256) {
         return userConversionRate[lister];
     }
@@ -118,8 +116,8 @@ contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
         _burn(from, amount);
     }
 
+    // Allow marketplace to transfer collateral from policy creator to policy buyer when policy buyer makes a claim
     function transferCollateral(address from, address to, uint256 amount) external {
-        // Deduct collateral from policy creator parked collateral to the claimant/policy buyer
         require(collateral[from] >= amount, "Insufficient collateral balance.");
         collateral[from] -= amount;
         payable(to).transfer(amount);

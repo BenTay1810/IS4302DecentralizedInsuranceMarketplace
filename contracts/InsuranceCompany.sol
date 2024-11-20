@@ -15,7 +15,8 @@ contract InsuranceCompany {
         validPolicyTypes["Property"] = true;
         validPolicyTypes["Life"] = true;
     }
-    // If User 1 does not have tokens to begin with to fulfill the max pool value, shdnt be allowed to create policy
+
+    // Modifier to ensure that the policy creator has enough tokens to cover the max pool value of the policy, without exceeding their token balance
     modifier checkEnoughTokenBal(uint256 maxPoolValue) {
         require(token.balanceOf(msg.sender) >= maxPoolValue, 
                 string(
@@ -36,6 +37,7 @@ contract InsuranceCompany {
         _;
     }
 
+    // Modifier to check that the defined claim back rate in a new policy must be > than that of the initial user conversion rate defined
     modifier higherClaimBackRate(uint256 claimBackRate, address lister) {
         require(claimBackRate > token.getUserConversionRate(lister), "Your claim back rate should be higher than your conversion rate");
         _;
@@ -47,7 +49,6 @@ contract InsuranceCompany {
         _;
     }
 
-    /* Added in creation Time + coverage period to replace active */
     struct Policy {
         uint256 policyId;
         string policyName;
@@ -56,22 +57,24 @@ contract InsuranceCompany {
         uint256 maxPoolValue;
         uint256 currPoolValue;
         uint256 minStake;
-        uint256 creationTime;
         uint coveragePeriod;
         address creator;
         bool listed;
     }
-
    
     uint256 public policyCount;
 
+    // Tracks the list of policies according to their policy Ids
     mapping(uint256 => Policy) policies;
-    // Mapping from lister's address to a list of policy IDs
+   
+    // Keeps track of the policy IDs created by each policy creator
     mapping(address => uint256[]) public listerPolicies;
 
-
+    // Emit necessary events for policy creation, listing and delisting
     event PolicyCreated(uint256 policyId, string policyName, address creator);
-    event PolicyClaimed(uint256 policyId, uint256 claimValue); 
+    event PolicyListed(uint256 policyId, string listed);
+    event PolicydeListed(uint256 policyId, string delisted);
+
     // Define an event to log policy details
     event PolicyDetails(
         uint256 policyId,
@@ -81,23 +84,19 @@ contract InsuranceCompany {
         uint256 maxPoolValue,
         uint256 currPoolValue,
         uint256 minStake,
-        uint256 creationTime,
         uint coveragePeriod,
         address creator,
         bool listed
-    );
-
-    event PolicyListed(uint256 policyId, string listed);
-    event PolicydeListed(uint256 policyId, string delisted);
+    );    
 
     function calculateNetClaimValue(Policy memory p)
         public
         pure
         returns (uint256)
     {
-        if (p.claimBackRate > 1) {
-            return (p.claimBackRate - 1) * p.maxPoolValue;
-        }
+        // if (p.claimBackRate > 1) {
+        //     return (p.claimBackRate - 1) * p.maxPoolValue;
+        // }
         return p.claimBackRate * p.maxPoolValue;
     }
 
@@ -115,20 +114,20 @@ contract InsuranceCompany {
     function createNewPolicy(
         string memory _policyName,
         string memory _policyType, 
-        uint256 _claimBackRate, // r we gonna require claim back rate > conversion rate?
-        uint256 _maxPoolValue,
-        uint256 _minStake, // min amount of tokens (premium) that a buyer must pay to get a share of being insured under the policy
-        uint _coveragePeriod // default this to days
+        uint256 _claimBackRate, 
+        uint256 _maxPoolValue, // Max. amount of CS tokens allocated to policy by policy creator, which are transferred to the marketplace when the policy is listed.
+        uint256 _minStake, // Min. amount of tokens (premium) that a buyer must pay to get a share of being insured under the policy
+        uint _coveragePeriod // Specifies the coverage duration for a policy buyer, starting from the purchase date, in days.
     ) external checkEnoughTokenBal(_maxPoolValue) validPolicyType(_policyType) higherClaimBackRate(_claimBackRate, msg.sender){
         require(
             // Ensure the policy creator's collateral is sufficient to cover potential claimback costs for created policies
-            token.getUserCollateral(msg.sender) >= calculateAllNetClaimValue(),
-            "Insufficient parked collateral to create this policy: reduce the max pool value for this policy"
+            token.getUserCollateral(msg.sender) > calculateAllNetClaimValue(),
+            "Insufficient collateral: reduce the max pool value for this policy or top up more CS tokens to increase your collateral"
         );
 
         policyCount++;
 
-
+        // Associate the policyId with the newly created policy in policies mapping
         policies[policyCount] = Policy({
             policyId: policyCount,
             policyName: _policyName,
@@ -137,12 +136,10 @@ contract InsuranceCompany {
             maxPoolValue: _maxPoolValue, 
             currPoolValue: 0,
             minStake: _minStake,
-            creationTime: block.timestamp,             
-            coveragePeriod: _coveragePeriod * 1 days, // blockchain stores it in seconds
+            coveragePeriod: _coveragePeriod * 1 days, // blockchain stores the coverage period in seconds
             creator: msg.sender, 
             listed: false
         });
-
 
         // Track the policy ID under the lister's address
         listerPolicies[msg.sender].push(policyCount);
@@ -150,7 +147,7 @@ contract InsuranceCompany {
         emit PolicyCreated(policyCount, _policyName, msg.sender);
     }
 
-    // Function to get the details of all policies created by a lister either from policy side or marketplace
+    // Function to get the details of all policies created by a lister
     function getListerPolicyDetails(address _lister) public 
     {
         uint256[] memory policyIds = listerPolicies[_lister];
@@ -169,7 +166,6 @@ contract InsuranceCompany {
                 policy.maxPoolValue,
                 policy.currPoolValue,
                 policy.minStake,
-                policy.creationTime,
                 policy.coveragePeriod,
                 policy.creator,
                 policy.listed
@@ -177,18 +173,16 @@ contract InsuranceCompany {
         }
     }
             
-
-    // For usage by marketplace
+    // To easily retrieve a policy based on its policy details
     function getPolicy(uint256 policyId) external view returns (Policy memory) {
         require(policyId > 0 && policyId <= policyCount, "Invalid policy ID");
         return policies[policyId];
     }
 
-    function updatePolicyPoolValue(uint256 policyId, uint256 newPoolValue)
-        external
+    // For marketplace to update current pool value of policy when a policy buyer buys a listed policy
+    function updatePolicyPoolValue(uint256 policyId, uint256 newPoolValue) external
     {
         Policy storage policy = policies[policyId];
-        require(block.timestamp <= (policy.creationTime + policy.coveragePeriod), "Policy is not active"); // check within active period
         require(policy.policyId == policyId, "Policy not found");
 
         policy.currPoolValue = newPoolValue;
@@ -196,21 +190,23 @@ contract InsuranceCompany {
         // can emit an event here
     }
 
-    
-    function _listPolicy(uint256 policyId) public isListable(policyId) {
+    // Allow policy listing from marketplace
+    function _listPolicy(uint256 policyId) external isListable(policyId) {
         Policy storage policy = policies[policyId];
         require(policy.listed == false, "Policy is already listed");
         changePolicyListedStatus(policyId);
         emit PolicyListed(policyId, "Policy has been listed successfully!");
     }
 
-    function _deListPolicy(uint256 policyId) public {
+    // Allow policy deListing from marketplace
+    function _deListPolicy(uint256 policyId) external {
         Policy storage policy = policies[policyId];
         require(policy.listed == true, "Policy is already delisted");
         changePolicyListedStatus(policyId);
         emit PolicydeListed(policyId, "Policy has been delisted successfully!");
     }
 
+    // Change the policy listed status internally 
     function changePolicyListedStatus(uint256 policyId) internal {
         Policy storage policy = policies[policyId];
         require(policy.policyId == policyId, "Policy not found");

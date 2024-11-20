@@ -16,6 +16,7 @@ contract Marketplace {
         company = _company;
     }
 
+    // Checks that buyer's coverage period has not ended for them to be able to make claims on their policy
     modifier isActive(uint256 policyId) {
         bool active = false;
         for (uint256 i = 0; i < policyHolders[msg.sender].length; i++) {
@@ -30,13 +31,14 @@ contract Marketplace {
         _;
     }
 
-
+    // Policy lister must own a policy to be able to list that specific policy Id
     modifier mustOwnPolicy(uint256 policyId) {
         InsuranceCompany.Policy memory policy = company.getPolicy(policyId);
         require(msg.sender == policy.creator, "You do not own this policy");
         _;
     }
 
+    // Policy buyer must have bought a policy to view their bought policies
     modifier isPolicyHolder() {
         require(policyHolders[msg.sender].length > 0, "You are not a policyholder");
         _;
@@ -68,13 +70,17 @@ contract Marketplace {
         uint256 ownedCSTokens 
     );
     event PolicyClaimed(uint256 policyId, uint256 claimAmount);
-    mapping(uint256 => uint256) public policyDeposits; // Tracks tokens deposited for each policy
-    mapping(address => BuyerPolicy[]) public policyHolders;
 
+    mapping(uint256 => uint256) public policyDeposits; // Tracks tokens authorized for the marketplace to manage and transfer to policy buyers for each listed policy
+
+    mapping(address => BuyerPolicy[]) public policyHolders;   // Tracks bought policies associated with a policy buyer
+
+    // For policy listers to list a policy
     function listPolicy(uint256 policyId) public mustOwnPolicy(policyId) {
         InsuranceCompany.Policy memory listedPolicy = company.getPolicy(policyId);
 
-        // Check if the user has approved the Marketplace to spend tokens on their behalf
+        /* Check if the policy creator has authorized the Marketplace to manage tokens up to the policy's max pool value. 
+        If not, approval is required to enable the transer of CS tokens to policy buyers when they purchase a share of the listed policy */
         uint256 allowance = token.allowance(msg.sender, address(this));
         require(
             allowance >= listedPolicy.maxPoolValue,
@@ -103,10 +109,8 @@ contract Marketplace {
         company._listPolicy(policyId);
     }
 
-    function viewListedPolicies()
-        external
-        view
-        returns (InsuranceCompany.Policy[] memory)
+    // For everyone to view all listed policies
+    function viewListedPolicies() external view returns (InsuranceCompany.Policy[] memory)
     {
         uint256 totalPolicies = company.policyCount();
         uint256 listedCount = 0;
@@ -143,7 +147,6 @@ contract Marketplace {
                     maxPoolValue: policy.maxPoolValue,
                     currPoolValue: policy.currPoolValue,
                     minStake: policy.minStake,
-                    creationTime: policy.creationTime,
                     coveragePeriod: policy.coveragePeriod,
                     creator: policy.creator,
                     listed: policy.listed
@@ -155,6 +158,7 @@ contract Marketplace {
         return listed;
     }
 
+    // For policy buyers to buy a listed policy. Minimally, they must provide an amount that is equivalent to the min.stake of the policy
     function buyPolicy(uint256 policyId) external payable {
         // Fetch the policy details
         InsuranceCompany.Policy memory policy = company.getPolicy(policyId);
@@ -210,8 +214,8 @@ contract Marketplace {
             ownedCSTokens: msg.value / token.getUserConversionRate(policy.creator)
         });
 
-        // Ensure the policy has enough tokens deposited
-        require(policyDeposits[policyId] >= msg.value / token.getUserConversionRate(policy.creator), "Insufficient tokens in policy deposit.");
+        // Ensure that marketplace has enough tokens approved to it by the policy kuster to transfer to the buyer
+        require(policyDeposits[policyId] >= msg.value / token.getUserConversionRate(policy.creator), "Insufficient tokens left to provide ");
 
         // Transfer tokens from Marketplace to buyer
         token.transfer(msg.sender, msg.value / token.getUserConversionRate(policy.creator));
@@ -227,7 +231,7 @@ contract Marketplace {
             policy.currPoolValue + (msg.value / token.getUserConversionRate(policy.creator))
         );
 
-        // Auto-delisting after updating policy pool value
+        // Auto-delisting the policy if the policy no longer has sufficient CS tokens to meet the min.stake required for buyers to buy into the policy.
         if (policy.maxPoolValue - policy.currPoolValue < policy.minStake) {
             delistPolicy(policyId);
         }
@@ -241,7 +245,7 @@ contract Marketplace {
         );
     }
 
-
+    // For policy buyers to make a claim on their bought policy, where their coverage period has not ended
     function claimPolicy(uint256 policyId) external isPolicyHolder isActive(policyId) {
         bool ownsPolicy = false;
         uint256 index = 0;
@@ -269,14 +273,14 @@ contract Marketplace {
         // Burns the policy buyer's owned tokens after they have claimed
         token.burn(msg.sender, ownedTokens);
 
-        // Remove the claimed policy from the buyer's array (swap and pop method)
+        // Remove the claimed policy from the buyer's bought policy
         removePolicy(msg.sender, index);
 
         // Emit event for successful claim
         emit PolicyClaimed(policyId, totalClaimableWei);
     }
 
-    // Remove a claimed policy from the buyer's array using the swap and pop method
+    // Helper method to remove a claimed policy from the buyer's bought policies 
     function removePolicy(address policyHolder, uint256 index) internal {
         require(index < policyHolders[policyHolder].length, "Index out of bounds");
 
@@ -287,6 +291,7 @@ contract Marketplace {
         policyHolders[policyHolder].pop();
     }
 
+    // For a policy buyer to view all their bought policies
     function viewMyBoughtPolicies()
         external isPolicyHolder
         view
@@ -310,6 +315,7 @@ contract Marketplace {
 
         return buyerPolicies; // Return the array of full BuyerPolicy structs
     }
+
 
     function delistPolicy(uint256 policyId) private {
         company._deListPolicy(policyId);
