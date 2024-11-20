@@ -108,13 +108,20 @@ contract CSToken is ERC20, ERC20Burnable, Ownable, ERC20Permit {
         return userConversionRate[lister];
     }
 
-    // should this be public? i feel like it should be handled by the marketplace contract only to burn
-    function burn(uint256 amount) public override {
-        _burn(msg.sender, amount);
+    // Allow marketplace to burn on behalf of buyer once they claim
+    function burn(address from, uint256 amount) public {
+        require(from != address(0), "ERC20: burn from the zero address");
+        uint256 accountBalance = balanceOf(from);
+        require(accountBalance >= amount, "ERC20: burn amount exceeds balance");
+
+        // Burn the tokens from the specified address
+        _burn(from, amount);
     }
-    function transferCollateral(address to, uint256 amount) external onlyOwner {
-        require(collateral[msg.sender] >= amount, "Insufficient collateral balance.");
-        collateral[msg.sender] -= amount;
+
+    function transferCollateral(address from, address to, uint256 amount) external {
+        // Deduct collateral from policy creator parked collateral to the claimant/policy buyer
+        require(collateral[from] >= amount, "Insufficient collateral balance.");
+        collateral[from] -= amount;
         payable(to).transfer(amount);
     }
 }

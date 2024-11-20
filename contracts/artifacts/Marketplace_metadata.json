@@ -27,6 +27,96 @@
 					{
 						"indexed": true,
 						"internalType": "address",
+						"name": "buyer",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "year",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "month",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "day",
+								"type": "uint256"
+							}
+						],
+						"indexed": false,
+						"internalType": "struct Marketplace.Date",
+						"name": "coverageStartTimestamp",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint256",
+								"name": "year",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "month",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "day",
+								"type": "uint256"
+							}
+						],
+						"indexed": false,
+						"internalType": "struct Marketplace.Date",
+						"name": "coverageEndTimestamp",
+						"type": "tuple"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "ownedCSTokens",
+						"type": "uint256"
+					}
+				],
+				"name": "PolicyBought",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "claimAmount",
+						"type": "uint256"
+					}
+				],
+				"name": "PolicyClaimed",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
 						"name": "creator",
 						"type": "address"
 					},
@@ -51,6 +141,19 @@
 				"name": "buyPolicy",
 				"outputs": [],
 				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "policyId",
+						"type": "uint256"
+					}
+				],
+				"name": "claimPolicy",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -459,6 +562,14 @@
 		"remappings": []
 	},
 	"sources": {
+		".deps/github/0x00pluto/solidity-datetime/contracts/DateTime.sol": {
+			"keccak256": "0x3e6031d05cd13aa1ea1bcaf59d6a4b20054ddc18a86514e44e66cd4ed4dc4445",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://2ce88e00d8a888f45bcf3ef95df7bcf8b90b97e4465b0427ba3407e3d19dc931",
+				"dweb:/ipfs/QmWwtMzN9fpxWF3RvhzsPFjQCsmiKhWV7LMKngKj5Xu3ne"
+			]
+		},
 		".deps/npm/@openzeppelin/contracts/access/Ownable.sol": {
 			"keccak256": "0xff6d0bb2e285473e5311d9d3caacb525ae3538a80758c10649a4d61029b017bb",
 			"license": "MIT",
@@ -627,76 +738,28 @@
 				"dweb:/ipfs/QmVUSvooZKEdEdap619tcJjTLcAuH6QBdZqAzWwnAXZAWJ"
 			]
 		},
-		"@openzeppelin/contracts/utils/Panic.sol": {
-			"keccak256": "0xf7fe324703a64fc51702311dc51562d5cb1497734f074e4f483bfb6717572d7a",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://c6a5ff4f9fd8649b7ee20800b7fa387d3465bd77cf20c2d1068cd5c98e1ed57a",
-				"dweb:/ipfs/QmVSaVJf9FXFhdYEYeCEfjMVHrxDh5qL4CGkxdMWpQCrqG"
-			]
-		},
-		"@openzeppelin/contracts/utils/Strings.sol": {
-			"keccak256": "0x725209b582291bb83058e3078624b53d15a133f7401c30295e7f3704181d2aed",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://0564ddb19c6d870e27b789d8f985283d815267ad7224883c2d5243c8bacc7dc0",
-				"dweb:/ipfs/QmeC953H4sj88ZRFdJNFdmpf7J9SksP1wK4jyMHLo66z49"
-			]
-		},
-		"@openzeppelin/contracts/utils/math/Math.sol": {
-			"keccak256": "0xa00be322d7db5786750ce0ac7e2f5b633ac30a5ed5fa1ced1e74acfc19acecea",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://6c84e822f87cbdc4082533b626667b6928715bb2b1e8e7eb96954cebb9e38c8d",
-				"dweb:/ipfs/QmZmy9dgxLTerBAQDuuHqbL6EpgRxddqgv5KmwpXYVbKz1"
-			]
-		},
-		"@openzeppelin/contracts/utils/math/SafeCast.sol": {
-			"keccak256": "0x195533c86d0ef72bcc06456a4f66a9b941f38eb403739b00f21fd7c1abd1ae54",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://b1d578337048cad08c1c03041cca5978eff5428aa130c781b271ad9e5566e1f8",
-				"dweb:/ipfs/QmPFKL2r9CBsMwmUqqdcFPfHZB2qcs9g1HDrPxzWSxomvy"
-			]
-		},
-		"@openzeppelin/contracts/utils/math/SignedMath.sol": {
-			"keccak256": "0xb1970fac7b64e6c09611e6691791e848d5e3fe410fa5899e7df2e0afd77a99e3",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://db5fbb3dddd8b7047465b62575d96231ba8a2774d37fb4737fbf23340fabbb03",
-				"dweb:/ipfs/QmVUSvooZKEdEdap619tcJjTLcAuH6QBdZqAzWwnAXZAWJ"
-			]
-		},
 		"contracts/CSToken.sol": {
-			"keccak256": "0xb34fd901ccb84e2394f9fe8539698a94d9661676b3a2b49154b54299c3061363",
+			"keccak256": "0xb8469e376eca1635f3663843bb8e3b7c4d71ce9fea2756d603d33106b4f05da7",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://338c898380df67d6fc295df0c28b18e1283906d068e863d3afa147702dd7f1a6",
-				"dweb:/ipfs/QmdDhHeqbBvQA6ctYx4gUsTEmvrNQTZx7yCnUbxDKQWD5L"
+				"bzz-raw://f589b45a45bf1e3f4b52733e9b78cc31330318eb3dacdfa2543f25cb49844554",
+				"dweb:/ipfs/QmZrAk7PHDFyu1H2RX7DYntBmaxbp3trd5bkriaiZxDntA"
 			]
 		},
 		"contracts/InsuranceCompany.sol": {
-			"keccak256": "0x04fabd4ddeca46e1788f33892e92eb58dbc23077e1285e16787a9323aa68578f",
+			"keccak256": "0x9b9283a85fc2740bd9bf72ace610bab245b3ac54ed3861c6555c27d164b6b0d3",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://54619182e74431be4e842f746e0abadaae1f89f3047f1986afad08da401c112a",
-				"dweb:/ipfs/QmcEUxhR5SEsrUKh8PVRZTuQmoewLNNV6bz9fVNvJ5pBkB"
+				"bzz-raw://ba9a309dc0239cb081553ce7792fa74f539fb1bae46e44279f3d94c6b499a4b3",
+				"dweb:/ipfs/QmavZWGxFraRd1zkB5R8qAHLqRwB3YRoHWymp6JwQRVHYu"
 			]
 		},
 		"contracts/Marketplace.sol": {
-			"keccak256": "0x7525156e64f1b134636f1205b02f2925f73c504babdf4f120aca065a8d261b5e",
+			"keccak256": "0x1d0ba39556d90b78b9c4a5c1e9c7d43e38f2ebde5386b6a5f180a33d83836692",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://36d242c0f363a5134f1839776910ba57f89d57f9bb7501cf5f0a1b104c1a59da",
-				"dweb:/ipfs/QmWFFgnxYV2ZmcnTh4QtCwiRaSRKDDWcxdNr5CcpEmL93y"
-			]
-		},
-		"https://github.com/0x00pluto/solidity-datetime/blob/master/contracts/DateTime.sol": {
-			"keccak256": "0x3e6031d05cd13aa1ea1bcaf59d6a4b20054ddc18a86514e44e66cd4ed4dc4445",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://2ce88e00d8a888f45bcf3ef95df7bcf8b90b97e4465b0427ba3407e3d19dc931",
-				"dweb:/ipfs/QmWwtMzN9fpxWF3RvhzsPFjQCsmiKhWV7LMKngKj5Xu3ne"
+				"bzz-raw://09e9f664af7d226873db44a8403aaa4d9e4bb5fb367d0810fa9b07da4505ecb3",
+				"dweb:/ipfs/QmVHz7cpaYamFQqZ4qFjq4ebSPmbkLeKmMMbgYYvCYEgw9"
 			]
 		}
 	},

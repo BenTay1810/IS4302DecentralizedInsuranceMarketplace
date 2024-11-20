@@ -155,7 +155,6 @@ contract Marketplace {
         return listed;
     }
 
-    // add amount of tokens they wanna buy?
     function buyPolicy(uint256 policyId) external payable {
         // Fetch the policy details
         InsuranceCompany.Policy memory policy = company.getPolicy(policyId);
@@ -264,41 +263,28 @@ contract Marketplace {
         // Calculate the total claim amount in Wei based on the claim back rate
         uint256 totalClaimableWei = ownedTokens * policy.claimBackRate;
 
-        // Get the Marketplace's available tokens for this policy
-        uint256 availableTokens = policyDeposits[policyId];
-        uint256 marketplaceClaimableWei = availableTokens * policy.claimBackRate;
+        // Transfer claim amount from policy creator's parked collateral to the policy buyer/claimer (ie.msg.sender in this case);
+        token.transferCollateral(policy.creator, msg.sender, totalClaimableWei);
 
-        // Transfer as much as possible from the Marketplace
-        uint256 weiToTransferFromMarketplace;
-        if (marketplaceClaimableWei >= totalClaimableWei) {
-            // Marketplace has sufficient funds to cover the claim
-            weiToTransferFromMarketplace = totalClaimableWei;
+        // Burns the policy buyer's owned tokens after they have claimed
+        token.burn(msg.sender, ownedTokens);
 
-            // Deduct tokens from the policy deposit
-            policyDeposits[policyId] -= ownedTokens;
-        } else {
-            // Marketplace cannot fully cover the claim, calculate the shortfall
-            weiToTransferFromMarketplace = marketplaceClaimableWei;
-            uint256 shortfallWei = totalClaimableWei - weiToTransferFromMarketplace;
-
-            // Deduct all remaining tokens from the Marketplace
-            policyDeposits[policyId] = 0;
-
-            // Transfer the remaining shortfall from the policy creator
-            require(
-                address(policy.creator).balance >= shortfallWei,
-                "Policy creator cannot cover the shortfall!"
-            );
-            payable(msg.sender).transfer(shortfallWei);
-        }
-
-        // Transfer the Wei from the Marketplace
-        if (weiToTransferFromMarketplace > 0) {
-            payable(msg.sender).transfer(weiToTransferFromMarketplace);
-        }
+        // Remove the claimed policy from the buyer's array (swap and pop method)
+        removePolicy(msg.sender, index);
 
         // Emit event for successful claim
         emit PolicyClaimed(policyId, totalClaimableWei);
+    }
+
+    // Remove a claimed policy from the buyer's array using the swap and pop method
+    function removePolicy(address policyHolder, uint256 index) internal {
+        require(index < policyHolders[policyHolder].length, "Index out of bounds");
+
+        // Swap the policy to be removed with the last policy in the array
+        policyHolders[policyHolder][index] = policyHolders[policyHolder][policyHolders[policyHolder].length - 1];
+
+        // Pop the last element
+        policyHolders[policyHolder].pop();
     }
 
     function viewMyBoughtPolicies()

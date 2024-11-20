@@ -111,7 +111,7 @@ contract InsuranceCompany {
         return sum;
     }
 
-    // Anyone who has enough tokens > max pool value & not at risk of bankruptcy from claim back rate will be able to create a policy
+    // Anyone who has enough tokens > max pool value & not at risk of collateral bankruptcy from claim back rate will be able to create a policy
     function createNewPolicy(
         string memory _policyName,
         string memory _policyType, 
@@ -121,10 +121,9 @@ contract InsuranceCompany {
         uint _coveragePeriod // default this to days
     ) external checkEnoughTokenBal(_maxPoolValue) validPolicyType(_policyType) higherClaimBackRate(_claimBackRate, msg.sender){
         require(
-           
-            token.balanceOf(address(msg.sender)) > calculateAllNetClaimValue(),
-            "Risk of bankruptcy: reduce the max pool value for this policy"
-            // Check against the balance of the msg.sender because he is the one who owns the tokens initially rather than the balance of insuranceCom contract?
+            // Ensure the policy creator's collateral is sufficient to cover potential claimback costs for created policies
+            token.getUserCollateral(msg.sender) >= calculateAllNetClaimValue(),
+            "Insufficient parked collateral to create this policy: reduce the max pool value for this policy"
         );
 
         policyCount++;
@@ -138,8 +137,8 @@ contract InsuranceCompany {
             maxPoolValue: _maxPoolValue, 
             currPoolValue: 0,
             minStake: _minStake,
-            creationTime: block.timestamp,              // track creation time
-            coveragePeriod: _coveragePeriod * 1 days, //
+            creationTime: block.timestamp,             
+            coveragePeriod: _coveragePeriod * 1 days, // blockchain stores it in seconds
             creator: msg.sender, 
             listed: false
         });
