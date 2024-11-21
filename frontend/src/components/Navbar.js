@@ -1,56 +1,19 @@
-import React from 'react';
+import React from 'react';import { Link } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Navbar = () => {
-  // // Define styles for the navbar
-  // const styles = {
-  //   navbar: {
-  //     display: 'flex',
-  //     justifyContent: 'space-between',
-  //     alignItems: 'center',
-  //     padding: '10px 20px',
-  //     backgroundColor: 'black', // Navbar background color
-  //     color: '#fff', // Text color
-  //   },
-  //   title: {
-  //     fontSize: '24px',
-  //     fontWeight: 'bold',
-  //   },
-  //   navLinks: {
-  //     listStyleType: 'none',
-  //     display: 'flex',
-  //     gap: '20px',
-  //   },
-  //   link: {
-  //     color: '#fff',
-  //     textDecoration: 'none',
-  //     fontSize: '18px',
-  //   },
-  // };
+
 
   return (
-    // <nav style={styles.navbar}>
-    //   <div style={styles.title}>ChainSure</div>
-    //   <ul style={styles.navLinks}>
-    //     <li>
-    //       <a href="#home" style={styles.link}>Marketplace</a>
-    //     </li>
-    //     <li>
-    //       <a href="#about" style={styles.link}>My Account</a>
-    //     </li>
-    //     <li>
-    //       <a href="#contact" style={styles.link}>Wallet</a>
-    //     </li>
-    //   </ul>
-    // </nav>
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-      <a className="navbar-brand" href="#">ChainSure</a>
+      <Link className="navbar-brand" to="/">ChainSure</Link> 
       <div className="collapse navbar-collapse">
         <ul className="navbar-nav ms-auto">
           <li className="nav-item">
-            <a className="nav-link" href="#home">Marketplace</a>
+            <Link className="nav-link" to="/">Marketplace</Link>
           </li>
           <li className="nav-item">
-            <a className="nav-link" href="#about">My Account</a>
+            <Link className="nav-link" to="/myacc">My Account</Link>
           </li>
           <li className="nav-item">
             <a className="nav-link" href="#contact">Wallet</a>
