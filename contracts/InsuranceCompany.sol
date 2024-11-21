@@ -100,9 +100,6 @@ contract InsuranceCompany {
         pure
         returns (uint256)
     {
-        // if (p.claimBackRate > 1) {
-        //     return (p.claimBackRate - 1) * p.maxPoolValue;
-        // }
         return p.claimBackRate * p.maxPoolValue;
     }
 

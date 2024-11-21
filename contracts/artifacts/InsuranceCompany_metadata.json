@@ -596,11 +596,11 @@
 			]
 		},
 		"contracts/InsuranceCompany.sol": {
-			"keccak256": "0xa6504fa7f4689f8c17effcaffbef3459ae1c813989b1a1b6791c496f053e224d",
+			"keccak256": "0xc1f50e3846d7690152df527cfbab09c1a41bb10efa5653abd08b4cebb6a6a7a1",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://f73a95e56df082aace506cbf4ec5a4d8c207a3412a0eb08561224358efacf861",
-				"dweb:/ipfs/QmPXArbtfEZjbB4cYsFARiPca2EENhwmXrCMc5GDRGqnPN"
+				"bzz-raw://7f7fe8e183aad20ce29906afb1e1b1a1e0103d0dc7de52347ee130377e076227",
+				"dweb:/ipfs/QmcZb2FmaN9op3Jc1SHkt63vkUmK3TfmVvC99YkhymXLe1"
 			]
 		}
 	},
