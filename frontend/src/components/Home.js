@@ -36,7 +36,10 @@ const Home = ({ policies }) => (
                 <span className="text-primary fw-bold">{policy.remainingPool}</span>
               </div>
               <div className="d-flex justify-content-end">
-                <button className="btn buy-button">Buy</button>
+                <Link to={`/policy/${policy.name.toLowerCase().replace(/\s+/g, '-')}`}
+                  className="btn buy-button">
+                  Buy
+                </Link>
               </div>
             </div>
           </div>
