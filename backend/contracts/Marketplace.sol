@@ -3,8 +3,8 @@ pragma solidity ^0.8.20;
 
 import "./CSToken.sol";
 import "./InsuranceCompany.sol";
-import ".deps/github/0x00pluto/solidity-datetime/contracts/DateTime.sol"; // for date time
-import ".deps/npm/@openzeppelin/contracts/utils/Strings.sol"; // for error specification
+import "./.deps/github/0x00pluto/solidity-datetime/contracts/DateTime.sol"; // for date time
+import "./.deps/npm/@openzeppelin/contracts/utils/Strings.sol"; // for error specification
 
 contract Marketplace {
     CSToken token;
