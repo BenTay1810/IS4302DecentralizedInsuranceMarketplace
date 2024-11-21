@@ -28,4 +28,4 @@ This deployment phase is meant to simulate all the contracts already being deplo
 - Allow a policy buyer to purchase a policy, provided they have paid the required minimum premium, which is calculated as follows:
 - `Minimum premium amount = Minimum stake of the created policy * Conversion rate`.
 - Allow a policy buyer to file a claim on their purchased policy, as long as their coverage period has not ended at the time of the claim
-- `End of Coverage Period = Policy purchase timestamp + Policy coverage period
+- `End of Coverage Period = Policy purchase timestamp + Policy coverage period`
