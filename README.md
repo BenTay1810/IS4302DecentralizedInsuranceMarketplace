@@ -47,7 +47,7 @@ This deployment phase is meant to simulate all the contracts already being deplo
    - MaxPoolValue: 5000 
    <!-- minimum stake is the minimum amount of tokens a policy buyer must own to get a share of the policy, in this case, the amount policy buyer must pay is 100 tokens * conversion rate of 2 = 200 wei -->
    - Minimum stake: 100
-   <!-- Coverage period specifies how long the policy buyer is working 
+   <!-- Coverage period specifies how long the policy buyer is working -->
    - Coverage period: 7 days (within blockchain it is stored as seconds, but will not affect claiming process)
 8) New policy with an Id of 1 is created by lister A, for him to view
 9) Lister A proceeds to list the policy with an Id of 1 using the `listPolicy` method in Marketplace.sol:
