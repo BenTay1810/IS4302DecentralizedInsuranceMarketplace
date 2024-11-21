@@ -1,27 +1,31 @@
 # IS4302 - ChainSure: Decentralized Insurance Marketplace
 
+
+## Stakeholders Involved
+Policy Listers (Insurers) & Policy Buyers (Policy Holders)
+
 # Remix Test Run
 
 ## Deployment phase
-Deploy CSToken.sol with 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
-Deploy InsuranceCompany.sol with 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2 using address of CSToken
-Deploy Marketplace.sol with 0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db using address of CSToken and address of InsuranceCompany
-
-
-2 stakeholders: Policy Listers & Policy Buyers
+Deploy all contracts (CSToken.sol, InsuranceCompany.sol, Marketplace.sol) with the address `0xdD870fA1b7C4700F2BD7f44238821C26f7392148`.
+This deployment phase is meant to simulate all the contracts already being deployed on the blockchain so that they can be used by policy listers and policy buyers 
 
 3 contracts:
 1) CSToken.sol
 2) InsuranceCompany.sol
 3) Marketplace.sol
 
-# CSToken.sol
-- Used by policy listers to mint CS tokens by converting an equivalent amount of wei to CS tokens based on a user-defined conversion rate
+## CSToken.sol
+- Used by policy listers to mint ChainSure (CS) tokens by converting an equivalent amount of wei to CS tokens based on a user-defined conversion rate
+- This enables policy listers to stake a certain amount of collateral to their minted cs tokens using the formula: `Minted CS tokens * Conversion Rate = Staked Collateral`.
 
-# InsuranceCompany.sol
-- Once a policy lister has minted CS tokens, they can then stake their CS tokens to create a policy within this contract, and list that policy within the marketplace
+## InsuranceCompany.sol
+- Once a policy lister has minted CS tokens, they can then stake their CS tokens by specifying a max pool value to create a policy within the InsuranceCompany contract
+- Max pool value = Maximum amount of CS tokens allocated by the policy lister to their created policy
 
-# Marketplace.sol
+## Marketplace.sol
 - Allows a policy lister to list their policy
-- Allows a policy buyer to buy a policy if they have paid the min.stake
-- Allows a policy buyer to make claims on their bought policy
+- Allow a policy buyer to purchase a policy, provided they have paid the required minimum premium, which is calculated as follows:
+- `Minimum premium amount = Minimum stake of the created policy * Conversion rate`.
+- Allow a policy buyer to file a claim on their purchased policy, as long as their coverage period has not ended at the time of the claim
+- `End of Coverage Period = Policy purchase timestamp + Policy coverage period
