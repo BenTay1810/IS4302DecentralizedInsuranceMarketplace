@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import "./CSToken.sol";
 import "./InsuranceCompany.sol";
@@ -214,7 +214,7 @@ contract Marketplace {
             ownedCSTokens: msg.value / token.getUserConversionRate(policy.creator)
         });
 
-        // Ensure that marketplace has enough tokens approved to it by the policy kuster to transfer to the buyer
+        // Ensure that marketplace has enough tokens approved to it by the policy lister to transfer to the buyer
         require(policyDeposits[policyId] >= msg.value / token.getUserConversionRate(policy.creator), "Insufficient tokens left to provide ");
 
         // Transfer tokens from Marketplace to buyer

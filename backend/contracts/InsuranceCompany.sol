@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity 0.8.20;
 
 import "./.deps/npm/@openzeppelin/contracts/utils/Strings.sol"; // for error specification
 import "./CSToken.sol";
@@ -120,7 +120,7 @@ contract InsuranceCompany {
         uint256 _claimBackRate, 
         uint256 _maxPoolValue, // Max. amount of CS tokens allocated to policy by policy creator, which are transferred to the marketplace when the policy is listed.
         uint256 _minStake, // Min. amount of tokens (premium) that a buyer must pay to get a share of being insured under the policy
-        uint _coveragePeriod // Specifies the coverage duration for a policy buyer, starting from the purchase date, in days.
+        uint256 _coveragePeriod // Specifies the coverage duration for a policy buyer, starting from the purchase date, in days.
     ) external checkEnoughTokenBal(_maxPoolValue) validPolicyType(_policyType) higherClaimBackRate(_claimBackRate, msg.sender){
 
         policyCount++;
