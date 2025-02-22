@@ -1,6 +1,7 @@
 # IS4302 - ChainSure: Decentralized Insurance Marketplace
 
-# [Design Document](https://docs.google.com/document/d/1DMRLv81oIaTPXTWZ_UbW6wftkhTvm5swFjtCNi_js1M/edit?usp=sharing)
+## White Paper & Architecture and Design Document
+View our Design Document [here](https://docs.google.com/document/d/1DMRLv81oIaTPXTWZ_UbW6wftkhTvm5swFjtCNi_js1M/edit?usp=sharing)
 
 
 ## Stakeholders Involved
